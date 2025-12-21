@@ -3,7 +3,7 @@ services:
     image: python:3.13-slim
     working_dir: /app
     volumes:
-      - .:/app
+      - .:/app:cached
     ports:
       - "8000:8000"
     command: bash -lc "pip install --no-cache-dir -r requirements.txt && python app.py"
@@ -12,14 +12,14 @@ services:
     image: node:22-slim
     working_dir: /app
     volumes:
-      - .:/app
+      - .:/app:cached
       - /app/node_modules
     ports:
       - "5173:5173"
     environment:
       - VITE_PROXY_TARGET=http://backend:8000
       - CHOKIDAR_USEPOLLING=true
-      - CHOKIDAR_INTERVAL=100
+      - CHOKIDAR_INTERVAL=50
     command: bash -lc "npm install && npm run dev -- --host 0.0.0.0"
     depends_on:
       - backend
