@@ -74,10 +74,8 @@ const ResultPanel = ({
       >
         {resultUrl ? (
           <>
-            <div className="preview-viewport relative p-4 sm:p-6">
-              <div className="preview-stage">
-                <img src={resultUrl} alt="Snapped result" className="preview-image pixelated" />
-              </div>
+            <div className="preview-viewport w-full relative p-4 sm:p-6">
+              <img src={resultUrl} alt="Snapped result" className="preview-image pixelated" />
             </div>
             <a
               href={resultUrl}
