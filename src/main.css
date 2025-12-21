@@ -43,6 +43,39 @@
   .reveal {
     animation: reveal 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
+
+  .pixelated {
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  .preview-viewport {
+    max-height: 360px;
+    overflow: auto;
+  }
+
+  .preview-stage {
+    transform-origin: top left;
+    width: fit-content;
+  }
+
+  .preview-image {
+    display: block;
+    height: auto;
+    max-width: 100%;
+  }
+
+  [data-preview-scale="1"] .preview-stage {
+    transform: scale(1);
+  }
+
+  [data-preview-scale="2"] .preview-stage {
+    transform: scale(2);
+  }
+
+  [data-preview-scale="3"] .preview-stage {
+    transform: scale(3);
+  }
 }
 
 @keyframes reveal {

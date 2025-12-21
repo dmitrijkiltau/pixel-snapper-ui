@@ -18,6 +18,9 @@ const $progressStepUpload = dom("#progress-step-upload");
 const $progressStepQueue = dom("#progress-step-queue");
 const $progressStepSnap = dom("#progress-step-snap");
 const $progressStepReady = dom("#progress-step-ready");
+const previewScaleButtons = Array.from(
+  document.querySelectorAll("button[data-preview-scale]")
+);
 
 const statusClasses = {
   info: "border-slate-200 bg-white/80 text-slate-600",
@@ -45,6 +48,18 @@ const progressSteps = {
   queue: $progressStepQueue,
   snap: $progressStepSnap,
   ready: $progressStepReady,
+};
+
+const previewScaleClasses = {
+  active:
+    "border-slate-900 bg-slate-900 text-white shadow-[0_8px_20px_-12px_rgba(15,23,42,0.8)]",
+  inactive:
+    "border-slate-200 bg-white/70 text-slate-600 hover:border-slate-400 hover:text-slate-900",
+};
+
+const previewScaleClassList = {
+  active: previewScaleClasses.active.split(" "),
+  inactive: previewScaleClasses.inactive.split(" "),
 };
 
 const progressStates = {
@@ -91,6 +106,7 @@ const HISTORY_LIMIT = 12;
 let activePreviewUrl = null;
 let activeUploadUrl = null;
 let isLoading = false;
+let previewScale = "1";
 
 const setStatus = (message, tone = "info") => {
   const toneClass = statusClasses[tone] || statusClasses.info;
@@ -165,7 +181,7 @@ const createPreviewImage = (url, altText) =>
     src: url,
     alt: altText,
     class:
-      "block max-h-[360px] w-full object-contain bg-[linear-gradient(135deg,rgba(15,23,42,0.04),rgba(148,163,184,0.08))] p-6",
+      "preview-image pixelated",
   });
 
 const renderUploadPlaceholder = () => {
@@ -251,7 +267,7 @@ const renderHistory = (items) => {
       alt: item.sourceName ? `Snapped ${item.sourceName}` : "Snapped image",
       loading: "lazy",
       class:
-        "h-36 w-full rounded-xl border border-slate-200 bg-[linear-gradient(135deg,rgba(15,23,42,0.04),rgba(148,163,184,0.08))] object-contain p-3",
+        "pixelated h-36 w-full rounded-xl border border-slate-200 bg-[linear-gradient(135deg,rgba(15,23,42,0.04),rgba(148,163,184,0.08))] object-contain p-3",
     });
     const meta = dom.create("div", {
       class: "flex flex-col gap-1 text-xs text-slate-500",
@@ -287,6 +303,27 @@ const renderHistory = (items) => {
   });
 };
 
+const setPreviewScale = (value) => {
+  if (!value) {
+    return;
+  }
+  previewScale = value;
+  $result.attr("data-preview-scale", value);
+  previewScaleButtons.forEach((button) => {
+    const isActive = button.dataset.previewScale === value;
+    button.classList.remove(
+      ...previewScaleClassList.active,
+      ...previewScaleClassList.inactive
+    );
+    button.classList.add(
+      ...(isActive
+        ? previewScaleClassList.active
+        : previewScaleClassList.inactive)
+    );
+    button.setAttribute("aria-pressed", isActive ? "true" : "false");
+  });
+};
+
 let historyItems = loadHistory();
 if (historyItems.length > HISTORY_LIMIT) {
   historyItems = historyItems.slice(0, HISTORY_LIMIT);
@@ -294,6 +331,13 @@ if (historyItems.length > HISTORY_LIMIT) {
 }
 renderHistory(historyItems);
 setProgressState("idle");
+setPreviewScale(previewScale);
+
+previewScaleButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setPreviewScale(button.dataset.previewScale);
+  });
+});
 
 const addHistoryItem = async ({ blob, sourceName, downloadName }) => {
   try {
@@ -321,9 +365,10 @@ const addHistoryItem = async ({ blob, sourceName, downloadName }) => {
 const setResult = (url, downloadName) => {
   const preview = dom.create("div", {
     class:
-      "relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm",
+      "preview-viewport relative rounded-2xl border border-slate-200 bg-[linear-gradient(135deg,rgba(15,23,42,0.04),rgba(148,163,184,0.08))] p-4 shadow-sm sm:p-6",
   });
   const img = createPreviewImage(url, "Snapped result");
+  const stage = dom.create("div", { class: "preview-stage" });
   const downloadLabel = downloadName || "snapped.png";
   const link = dom.create(
     "a",
@@ -336,7 +381,8 @@ const setResult = (url, downloadName) => {
     `Download ${downloadLabel}`
   );
 
-  preview.append(img);
+  stage.append(img);
+  preview.append(stage);
   $result.empty().append(preview).append(link);
 };
 
