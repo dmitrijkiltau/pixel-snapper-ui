@@ -24,3 +24,14 @@ Vite proxies `/process` to the Flask server on port 8000.
 ```
 
 Access the web app at `http://localhost:8000`.
+
+## Docker Compose (development)
+```bash
+  docker compose up --build
+```
+Vite is available at `http://localhost:5173` and proxies `/process` to the Flask app on port 8000.
+
+## Docker Compose (production)
+```bash
+  docker compose -f docker-compose.prod.yml up --build
+```
