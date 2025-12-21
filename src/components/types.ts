@@ -11,4 +11,8 @@ export type HistoryItem = {
   sourceName: string;
   downloadName: string;
   createdAt: number;
+  width?: number;
+  height?: number;
+  kColors?: number;
+  kSeed?: number;
 };

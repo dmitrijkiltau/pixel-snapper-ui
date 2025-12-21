@@ -1,4 +1,4 @@
-FROM node:20-slim AS frontend
+FROM node:22-slim AS frontend
 
 WORKDIR /app
 
@@ -10,9 +10,12 @@ COPY src ./src
 
 RUN npm run build
 
-FROM python:3.12-slim
+FROM python:3.13-slim
 
 WORKDIR /app
+
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:${PATH}"
 
 RUN pip install --no-cache-dir --upgrade pip
 

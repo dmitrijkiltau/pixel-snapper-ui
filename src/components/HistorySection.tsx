@@ -1,5 +1,5 @@
 import type { HistoryItem } from "./types";
-import { SectionHeader, StepPill } from "./shared";
+import { SectionHeader, StepPill, TagPill } from "./shared";
 
 const formatTimestamp = (value: number) => {
   const date = new Date(value);
@@ -15,20 +15,47 @@ type HistoryCardProps = {
 
 const HistoryCard = ({ item }: HistoryCardProps) => {
   const timestamp = formatTimestamp(item.createdAt);
+  const paletteLabel =
+    typeof item.kColors === "number" && Number.isFinite(item.kColors)
+      ? `${item.kColors} colors`
+      : null;
+  const dimensionsLabel =
+    typeof item.width === "number" &&
+    typeof item.height === "number" &&
+    Number.isFinite(item.width) &&
+    Number.isFinite(item.height)
+      ? `${item.width}x${item.height} px`
+      : null;
+  const seedLabel =
+    typeof item.kSeed === "number" && Number.isFinite(item.kSeed)
+      ? String(item.kSeed)
+      : null;
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/60">
-      <img
-        src={item.dataUrl}
-        alt={item.sourceName ? `Snapped ${item.sourceName}` : "Snapped image"}
-        loading="lazy"
-        className="pixelated h-36 w-full rounded-xl border border-slate-200 bg-[linear-gradient(135deg,rgba(15,23,42,0.04),rgba(148,163,184,0.08))] object-contain p-3 dark:border-slate-700 dark:bg-[linear-gradient(135deg,rgba(15,23,42,0.7),rgba(30,41,59,0.55))]"
-      />
-      <div className="flex flex-col gap-1 text-xs text-slate-500 dark:text-slate-300">
-        <span className="font-semibold text-slate-700 dark:text-slate-100">
-          {item.downloadName || item.sourceName || "Snapped image"}
-        </span>
-        {timestamp ? <span>{timestamp}</span> : null}
+    <details className="flex flex-col gap-3 rounded-2xl border border-slate-200/70 bg-white/80 p-4 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/60">
+      <summary className="details-summary flex cursor-pointer flex-col gap-3">
+        <img
+          src={item.dataUrl}
+          alt={item.sourceName ? `Snapped ${item.sourceName}` : "Snapped image"}
+          loading="lazy"
+          className="pixelated h-36 w-full rounded-xl border border-slate-200 bg-[linear-gradient(135deg,rgba(15,23,42,0.04),rgba(148,163,184,0.08))] object-contain p-3 dark:border-slate-700 dark:bg-[linear-gradient(135deg,rgba(15,23,42,0.7),rgba(30,41,59,0.55))]"
+        />
+        <div className="flex flex-col gap-1 text-xs text-slate-500 dark:text-slate-300">
+          <span className="font-semibold text-slate-700 dark:text-slate-100">
+            {item.downloadName || item.sourceName || "Snapped image"}
+          </span>
+          {timestamp || paletteLabel ? (
+            <div className="flex items-center justify-between gap-2">
+              <span>{timestamp}</span>
+              {paletteLabel ? <TagPill label={paletteLabel} /> : null}
+            </div>
+          ) : null}
+        </div>
+      </summary>
+      <div className="flex flex-col gap-2 text-xs text-slate-500 dark:text-slate-300">
+        {dimensionsLabel ? <span>Dimensions: {dimensionsLabel}</span> : null}
+        {paletteLabel ? <span>Palette: {paletteLabel}</span> : null}
+        {seedLabel ? <span>Seed: {seedLabel}</span> : null}
         {item.sourceName ? <span>Source: {item.sourceName}</span> : null}
       </div>
       <a
@@ -38,7 +65,7 @@ const HistoryCard = ({ item }: HistoryCardProps) => {
       >
         Download
       </a>
-    </div>
+    </details>
   );
 };
 

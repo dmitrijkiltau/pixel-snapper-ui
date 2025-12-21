@@ -105,6 +105,30 @@ const blobToDataUrl = (blob: Blob) =>
     reader.readAsDataURL(blob);
   });
 
+const getImageDimensions = async (blob: Blob) => {
+  if (typeof createImageBitmap === "function") {
+    const bitmap = await createImageBitmap(blob);
+    const dimensions = { width: bitmap.width, height: bitmap.height };
+    bitmap.close?.();
+    return dimensions;
+  }
+
+  return new Promise<{ width: number; height: number }>((resolve, reject) => {
+    const url = URL.createObjectURL(blob);
+    const image = new Image();
+    image.decoding = "async";
+    image.onload = () => {
+      resolve({ width: image.naturalWidth, height: image.naturalHeight });
+      URL.revokeObjectURL(url);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Failed to read image dimensions."));
+    };
+    image.src = url;
+  });
+};
+
 const loadHistory = (): HistoryItem[] => {
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
@@ -141,6 +165,9 @@ const App = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [resultDownloadName, setResultDownloadName] = useState("snapped.png");
+  const [resultDimensions, setResultDimensions] = useState<{ width: number; height: number } | null>(
+    null
+  );
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [kColorsValue, setKColorsValue] = useState("16");
   const [kSeedValue, setKSeedValue] = useState("42");
@@ -209,7 +236,12 @@ const App = () => {
     }
   };
 
-  const addHistoryItem = async (blob: Blob, sourceName: string, downloadName: string) => {
+  const addHistoryItem = async (
+    blob: Blob,
+    sourceName: string,
+    downloadName: string,
+    meta: { width?: number; height?: number; kColors: number; kSeed: number }
+  ) => {
     try {
       const dataUrl = await blobToDataUrl(blob);
       const entry: HistoryItem = {
@@ -218,6 +250,10 @@ const App = () => {
         sourceName: sourceName || "",
         downloadName: downloadName || "snapped.png",
         createdAt: Date.now(),
+        width: meta.width,
+        height: meta.height,
+        kColors: meta.kColors,
+        kSeed: meta.kSeed,
       };
       setHistoryItems((prev) => [entry, ...prev].slice(0, HISTORY_LIMIT));
     } catch {
@@ -286,11 +322,23 @@ const App = () => {
         throw new Error("Empty response from the server.");
       }
 
+      const downloadName = toSafeDownloadName(selectedFile.name);
       const nextUrl = URL.createObjectURL(blob);
       setResultUrl(nextUrl);
-      const downloadName = toSafeDownloadName(selectedFile.name);
       setResultDownloadName(downloadName);
-      void addHistoryItem(blob, selectedFile.name, downloadName);
+      let dimensions: { width: number; height: number } | null = null;
+      try {
+        dimensions = await getImageDimensions(blob);
+      } catch {
+        dimensions = null;
+      }
+      setResultDimensions(dimensions);
+      void addHistoryItem(blob, selectedFile.name, downloadName, {
+        width: dimensions?.width,
+        height: dimensions?.height,
+        kColors: parsedColors,
+        kSeed: parsedSeed,
+      });
       setStatus("Snapped. Your download is ready.", "success");
       updateProgress("complete");
     } catch (error) {
@@ -411,6 +459,7 @@ const App = () => {
           <ResultPanel
             resultUrl={resultUrl}
             resultDownloadName={resultDownloadName}
+            resultDimensions={resultDimensions}
             previewScale={previewScale}
             onPreviewScaleChange={setPreviewScale}
           />

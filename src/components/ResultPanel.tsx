@@ -41,6 +41,7 @@ const PreviewScaleSelector = ({ value, onChange }: PreviewScaleSelectorProps) =>
 type ResultPanelProps = {
   resultUrl: string | null;
   resultDownloadName: string;
+  resultDimensions: { width: number; height: number } | null;
   previewScale: PreviewScale;
   onPreviewScaleChange: (value: PreviewScale) => void;
 };
@@ -48,56 +49,71 @@ type ResultPanelProps = {
 const ResultPanel = ({
   resultUrl,
   resultDownloadName,
+  resultDimensions,
   previewScale,
   onPreviewScaleChange,
-}: ResultPanelProps) => (
-  <section className="panel-card flex flex-col gap-5 reveal" style={{ animationDelay: "220ms" }}>
-    <SectionHeader
-      title="Result"
-      subtitle="PNG preview with crisp grid edges."
-      action={<StepPill label="Step 2" />}
-    />
+}: ResultPanelProps) => {
+  const dimensionLabel =
+    resultDimensions && resultDimensions.width && resultDimensions.height
+      ? `${resultDimensions.width}x${resultDimensions.height} px`
+      : null;
 
-    <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-300">
-      <span className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-400 dark:text-slate-400">
-        Preview scale
-      </span>
+  return (
+    <section className="panel-card flex flex-col gap-5 reveal" style={{ animationDelay: "220ms" }}>
+      <SectionHeader
+        title="Result"
+        subtitle="PNG preview with crisp grid edges."
+        action={<StepPill label="Step 2" />}
+      />
+
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-300">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-400 dark:text-slate-400">
+            Preview scale
+          </span>
+          {dimensionLabel ? (
+            <span className="rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-[0.65rem] font-semibold text-slate-600 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300">
+              Dimensions {dimensionLabel}
+            </span>
+          ) : null}
+      </div>
       <PreviewScaleSelector value={previewScale} onChange={onPreviewScaleChange} />
     </div>
 
-    <div className="flex flex-col gap-4">
-      <div
-        id="result"
-        data-preview-scale={previewScale}
-        className="flex min-h-[280px] flex-col items-center justify-center gap-2 text-center text-sm text-slate-500 dark:text-slate-300"
-        aria-live="polite"
-      >
-        {resultUrl ? (
-          <>
-            <div className="preview-viewport w-full relative p-4 sm:p-6">
-              <img src={resultUrl} alt="Snapped result" className="preview-image pixelated" />
-            </div>
-            <a
-              href={resultUrl}
-              download={resultDownloadName}
-              className="mt-4 inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-slate-100"
-            >
-              Download {resultDownloadName}
-            </a>
-          </>
-        ) : (
-          <>
-            <span className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-400 dark:text-slate-400">Awaiting</span>
-            <p>Upload an image and hit Snap.</p>
-          </>
-        )}
+      <div className="flex flex-col gap-4">
+        <div
+          id="result"
+          data-preview-scale={previewScale}
+          className="flex min-h-[280px] flex-col items-center justify-center gap-2 text-center text-sm text-slate-500 dark:text-slate-300"
+          aria-live="polite"
+        >
+          {resultUrl ? (
+            <>
+              <div className="preview-viewport relative w-full p-4 sm:p-6">
+                <img src={resultUrl} alt="Snapped result" className="preview-image pixelated" />
+              </div>
+              <a
+                href={resultUrl}
+                download={resultDownloadName}
+                className="mt-4 inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/80 px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-slate-100"
+              >
+                Download {resultDownloadName}
+              </a>
+            </>
+          ) : (
+            <>
+              <span className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-400 dark:text-slate-400">Awaiting</span>
+              <p>Upload an image and hit Snap.</p>
+            </>
+          )}
+        </div>
       </div>
-    </div>
 
-    <div className="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-3 text-xs text-slate-500 dark:border-slate-700/70 dark:bg-slate-900/60 dark:text-slate-300">
-      Tip: AI pixel outputs snap best when they are slightly oversized.
-    </div>
-  </section>
-);
+      <div className="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-3 text-xs text-slate-500 dark:border-slate-700/70 dark:bg-slate-900/60 dark:text-slate-300">
+        Tip: AI pixel outputs snap best when they are slightly oversized.
+      </div>
+    </section>
+  );
+};
 
 export default ResultPanel;
