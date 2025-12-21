@@ -16,6 +16,7 @@ import type {
   PreviewScale,
   StatusTone,
 } from "./components/types";
+import { processImageBlob } from "./pixelSnapper";
 
 type ProgressOverrides = {
   label?: string;
@@ -302,24 +303,12 @@ const App = () => {
       }
 
       updateProgress("processing");
-      const formData = new FormData();
-      formData.append("image", selectedFile);
-      formData.append("k_colors", String(parsedColors));
-      formData.append("k_seed", String(parsedSeed));
-
-      const response = await fetch("/process", {
-        method: "POST",
-        body: formData,
+      const blob = await processImageBlob(selectedFile, {
+        kColors: parsedColors,
+        kSeed: parsedSeed,
       });
-
-      if (!response.ok) {
-        const message = await response.text();
-        throw new Error(message || "Something went wrong. Try a different image.");
-      }
-
-      const blob = await response.blob();
       if (!blob || blob.size === 0) {
-        throw new Error("Empty response from the server.");
+        throw new Error("No output generated. Try a different image.");
       }
 
       const downloadName = toSafeDownloadName(selectedFile.name);
