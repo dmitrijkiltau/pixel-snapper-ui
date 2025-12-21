@@ -8,11 +8,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@klt/dom-js": "^1.6.38"
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.0.0",
-    "tailwindcss": "^4.0.0",
-    "vite": "^5.4.0"
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.2",
+    "@tailwindcss/vite": "^4.1.18",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0"
   }
 }

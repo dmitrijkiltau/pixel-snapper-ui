@@ -1,30 +1,14 @@
 import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 const proxyTarget = process.env.VITE_PROXY_TARGET || "http://localhost:8000";
 
 export default defineConfig({
-  plugins: [tailwindcss()],
+  plugins: [react(), tailwindcss()],
   server: {
     proxy: {
       "/process": proxyTarget,
-    },
-  },
-  build: {
-    outDir: "static/dist",
-    emptyOutDir: true,
-    rollupOptions: {
-      input: "src/main.js",
-      output: {
-        entryFileNames: "app.js",
-        chunkFileNames: "chunk-[name].js",
-        assetFileNames: (assetInfo) => {
-          if (assetInfo.name && assetInfo.name.endsWith(".css")) {
-            return "app.css";
-          }
-          return "assets/[name][extname]";
-        },
-      },
     },
   },
 });
