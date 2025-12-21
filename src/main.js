@@ -13,11 +13,76 @@ const $uploadPreview = dom("#upload-preview");
 const $history = dom("#history");
 const $fileInput = dom("#image-input");
 const $fileName = dom("#file-name");
+const $progressStatus = dom("#progress-status");
+const $progressStepUpload = dom("#progress-step-upload");
+const $progressStepQueue = dom("#progress-step-queue");
+const $progressStepSnap = dom("#progress-step-snap");
+const $progressStepReady = dom("#progress-step-ready");
 
 const statusClasses = {
   info: "border-slate-200 bg-white/80 text-slate-600",
   success: "border-emerald-200 bg-emerald-50 text-emerald-700",
   error: "border-rose-200 bg-rose-50 text-rose-700",
+};
+
+const progressStatusClasses = {
+  info: "border-slate-200 bg-white/80 text-slate-600",
+  active: "border-slate-900 bg-slate-900 text-white",
+  success: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  error: "border-rose-200 bg-rose-50 text-rose-700",
+};
+
+const progressStepClasses = {
+  idle: "border-slate-200 bg-white/70 text-slate-500",
+  active:
+    "border-slate-900 bg-slate-900 text-white shadow-[0_12px_30px_-20px_rgba(15,23,42,0.85)]",
+  complete: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  error: "border-rose-200 bg-rose-50 text-rose-700",
+};
+
+const progressSteps = {
+  upload: $progressStepUpload,
+  queue: $progressStepQueue,
+  snap: $progressStepSnap,
+  ready: $progressStepReady,
+};
+
+const progressStates = {
+  idle: {
+    label: "Awaiting upload",
+    tone: "info",
+    steps: { upload: "active", queue: "idle", snap: "idle", ready: "idle" },
+  },
+  ready: {
+    label: "Ready to snap",
+    tone: "active",
+    steps: { upload: "complete", queue: "idle", snap: "idle", ready: "idle" },
+  },
+  processing: {
+    label: "Processing",
+    tone: "active",
+    steps: {
+      upload: "complete",
+      queue: "complete",
+      snap: "active",
+      ready: "idle",
+    },
+  },
+  complete: {
+    label: "Download ready",
+    tone: "success",
+    steps: {
+      upload: "complete",
+      queue: "complete",
+      snap: "complete",
+      ready: "complete",
+    },
+  },
+  error: {
+    label: "Needs attention",
+    tone: "error",
+    steps: { upload: "error", queue: "idle", snap: "idle", ready: "idle" },
+  },
 };
 
 const HISTORY_KEY = "pixel-snapper-history";
@@ -42,6 +107,34 @@ const setLoading = (loading) => {
   $form.toggleClass("opacity-60", loading);
   $form.attr("aria-busy", loading ? "true" : "false");
   $submit.prop("disabled", loading);
+};
+
+const setProgressStatus = (label, tone = "info") => {
+  $progressStatus
+    .removeClass(Object.values(progressStatusClasses).join(" "))
+    .addClass(progressStatusClasses[tone] || progressStatusClasses.info)
+    .text(label);
+};
+
+const applyProgressSteps = (steps) => {
+  Object.entries(progressSteps).forEach(([key, element]) => {
+    const stepState = steps[key] || "idle";
+    const stepClass =
+      progressStepClasses[stepState] || progressStepClasses.idle;
+    element
+      .removeClass(Object.values(progressStepClasses).join(" "))
+      .addClass(stepClass);
+  });
+};
+
+const setProgressState = (state, overrides = {}) => {
+  const config = progressStates[state] || progressStates.idle;
+  const steps = { ...config.steps, ...(overrides.steps || {}) };
+  const label = overrides.label || config.label;
+  const tone = overrides.tone || config.tone || "info";
+
+  setProgressStatus(label, tone);
+  applyProgressSteps(steps);
 };
 
 const toSafeDownloadName = (originalName) => {
@@ -200,6 +293,7 @@ if (historyItems.length > HISTORY_LIMIT) {
   saveHistory(historyItems);
 }
 renderHistory(historyItems);
+setProgressState("idle");
 
 const addHistoryItem = async ({ blob, sourceName, downloadName }) => {
   try {
@@ -250,6 +344,10 @@ $fileInput.on("change", (ev, input) => {
   const file = input.files && input.files[0];
   $fileName.text(file ? file.name : "No file selected");
   setUploadPreview(file);
+  if (isLoading) {
+    return;
+  }
+  setProgressState(file ? "ready" : "idle");
 });
 
 $form.on("submit", async (ev, form) => {
@@ -266,9 +364,14 @@ $form.on("submit", async (ev, form) => {
     const file = formData.get("image");
     if (!file || (file instanceof File && file.size === 0)) {
       setStatus("Pick an image before snapping.", "error");
+      setProgressState("error", {
+        label: "Image needed",
+        steps: { upload: "error", queue: "idle", snap: "idle", ready: "idle" },
+      });
       return;
     }
 
+    setProgressState("processing");
     const response = await api.post("/process", formData);
     const blob = await response.blob();
     if (!blob || blob.size === 0) {
@@ -284,12 +387,22 @@ $form.on("submit", async (ev, form) => {
     setResult(activePreviewUrl, downloadName);
     addHistoryItem({ blob, sourceName: file.name, downloadName });
     setStatus("Snapped. Your download is ready.", "success");
+    setProgressState("complete");
   } catch (error) {
     const message =
       error && typeof error.message === "string"
         ? error.message
         : "Something went wrong. Try a different image.";
     setStatus(message, "error");
+    setProgressState("error", {
+      label: "Snap failed",
+      steps: {
+        upload: "complete",
+        queue: "complete",
+        snap: "error",
+        ready: "idle",
+      },
+    });
   } finally {
     setLoading(false);
   }
