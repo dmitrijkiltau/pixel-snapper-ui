@@ -20,6 +20,7 @@ services:
       - VITE_PROXY_TARGET=http://backend:8000
       - CHOKIDAR_USEPOLLING=true
       - CHOKIDAR_INTERVAL=50
-    command: bash -lc "npm install && npm run dev -- --host 0.0.0.0"
+    entrypoint: ["/bin/sh", "/app/docker-entrypoint.dev.sh"]
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
     depends_on:
       - backend
