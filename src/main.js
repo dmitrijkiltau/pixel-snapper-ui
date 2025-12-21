@@ -76,16 +76,7 @@ const createPreviewImage = (url, altText) =>
   });
 
 const renderUploadPlaceholder = () => {
-  $uploadPreview
-    .empty()
-    .append(
-      dom.create("span", {
-        class:
-          "text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-400",
-        text: "Preview",
-      })
-    )
-    .append(dom.create("p", { text: "Pick an image to see it here." }));
+  $uploadPreview.attr("src", "").attr("alt", "").addClass("hidden");
 };
 
 const setUploadPreview = (file) => {
@@ -100,17 +91,10 @@ const setUploadPreview = (file) => {
   }
 
   activeUploadUrl = URL.createObjectURL(file);
-  const label = dom.create("span", {
-    class:
-      "text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-400",
-    text: "Uploaded",
-  });
-  const img = createPreviewImage(
-    activeUploadUrl,
-    file.name ? `Uploaded ${file.name}` : "Uploaded image"
-  );
-
-  $uploadPreview.empty().append(label).append(img);
+  $uploadPreview
+    .attr("src", activeUploadUrl)
+    .attr("alt", file.name ? `Uploaded ${file.name}` : "Uploaded image")
+    .removeClass("hidden");
 };
 
 const loadHistory = () => {
@@ -203,7 +187,9 @@ const renderHistory = (items) => {
       },
       "Download"
     );
-    card.append(img).append(meta).append(link);
+    card.append(img);
+    card.append(meta);
+    card.append(link);
     $history.append(card);
   });
 };
