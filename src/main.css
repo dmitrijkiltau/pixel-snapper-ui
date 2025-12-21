@@ -10,6 +10,10 @@
     --font-mono: "Space Mono", "SFMono-Regular", "Menlo", monospace;
     --ink: #12131a;
     --paper: #f5f0e6;
+    --grid-color: 15 23 42;
+    --card-border: 226 232 240;
+    --card-bg: 255 255 255;
+    --card-shadow: 15 23 42;
   }
 
   body {
@@ -19,32 +23,47 @@
   }
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #f8fafc;
+    --paper: #0b1120;
+    --grid-color: 148 163 184;
+    --card-border: 30 41 59;
+    --card-bg: 15 23 42;
+    --card-shadow: 2 6 23;
+  }
+
+  body {
+    color-scheme: dark;
+  }
+}
+
 @layer utilities {
   .pixel-grid {
     background-image:
-      linear-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+      linear-gradient(rgb(var(--grid-color) / 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--grid-color) / 0.08) 1px, transparent 1px);
     background-size: 16px 16px;
   }
 
   .glass-card {
-    border: 1px solid rgb(226 232 240 / 0.7);
-    background-color: rgb(255 255 255 / 0.75);
-    box-shadow: 0 20px 60px -35px rgba(15, 23, 42, 0.65);
+    border: 1px solid rgb(var(--card-border) / 0.7);
+    background-color: rgb(var(--card-bg) / 0.75);
+    box-shadow: 0 20px 60px -35px rgb(var(--card-shadow) / 0.65);
     backdrop-filter: blur(8px);
   }
 
   .panel-card {
-    border: 1px solid rgb(226 232 240 / 0.7);
-    background-color: rgb(255 255 255 / 0.75);
-    box-shadow: 0 20px 60px -35px rgba(15, 23, 42, 0.65);
+    border: 1px solid rgb(var(--card-border) / 0.7);
+    background-color: rgb(var(--card-bg) / 0.75);
+    box-shadow: 0 20px 60px -35px rgb(var(--card-shadow) / 0.65);
     backdrop-filter: blur(8px);
     border-radius: 1.5rem;
     padding: 1.5rem;
   }
 
   .tag-pill {
-    @apply rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500;
+    @apply rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300;
   }
 
   .step-pill {
@@ -52,7 +71,7 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_-16px_rgba(15,23,42,0.9)] transition hover:-translate-y-0.5 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/60;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_-16px_rgba(15,23,42,0.9)] transition hover:-translate-y-0.5 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white dark:shadow-[0_12px_30px_-16px_rgba(8,15,30,0.9)] dark:focus-visible:ring-slate-200/70;
   }
 
   .btn-primary:disabled {

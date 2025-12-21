@@ -22,7 +22,9 @@ export const StepPill = ({ label, tone = "light" }: StepPillProps) => (
   <span
     className={cx(
       "step-pill",
-      tone === "dark" ? "bg-slate-900 text-white" : "bg-white/70 text-slate-500"
+      tone === "dark"
+        ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
+        : "bg-white/70 text-slate-500 dark:bg-slate-900/70 dark:text-slate-300"
     )}
   >
     {label}
@@ -38,8 +40,8 @@ type SectionHeaderProps = {
 export const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) => (
   <div className="flex items-center justify-between gap-4">
     <div>
-      <h2 className="text-lg font-semibold">{title}</h2>
-      <p className="text-sm text-slate-500">{subtitle}</p>
+      <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
+      <p className="text-sm text-slate-500 dark:text-slate-300">{subtitle}</p>
     </div>
     {action ? <div className="shrink-0">{action}</div> : null}
   </div>

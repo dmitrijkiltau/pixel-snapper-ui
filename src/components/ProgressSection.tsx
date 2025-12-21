@@ -3,25 +3,36 @@ import type { ProgressStepKey, ProgressStepState, ProgressTone } from "./types";
 import { cx, SectionHeader } from "./shared";
 
 const progressStatusClasses: Record<ProgressTone, string> = {
-  info: "border-slate-200 bg-white/80 text-slate-600",
-  active: "border-slate-900 bg-slate-900 text-white",
-  success: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  error: "border-rose-200 bg-rose-50 text-rose-700",
+  info:
+    "border-slate-200 bg-white/80 text-slate-600 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300",
+  active:
+    "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900",
+  success:
+    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-500/15 dark:text-emerald-200",
+  error:
+    "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/40 dark:bg-rose-500/15 dark:text-rose-200",
 };
 
 const progressStepClasses: Record<ProgressStepState, string> = {
-  idle: "border-slate-200 bg-white/70 text-slate-500",
+  idle:
+    "border-slate-200 bg-white/70 text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300",
   active:
-    "border-slate-900 bg-slate-900 text-white shadow-[0_16px_40px_-28px_rgba(15,23,42,0.9)]",
-  complete: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  error: "border-rose-200 bg-rose-50 text-rose-700",
+    "border-slate-900 bg-slate-900 text-white shadow-[0_16px_40px_-28px_rgba(15,23,42,0.9)] dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900 dark:shadow-[0_16px_40px_-28px_rgba(8,15,30,0.8)]",
+  complete:
+    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-500/15 dark:text-emerald-200",
+  error:
+    "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/40 dark:bg-rose-500/15 dark:text-rose-200",
 };
 
 const progressBadgeClasses: Record<ProgressStepState, string> = {
-  idle: "border-slate-200 bg-white/80 text-slate-500",
-  active: "border-white/20 bg-white/10 text-white",
-  complete: "border-emerald-200 bg-emerald-100 text-emerald-700",
-  error: "border-rose-200 bg-rose-100 text-rose-700",
+  idle:
+    "border-slate-200 bg-white/80 text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300",
+  active:
+    "border-white/20 bg-white/10 text-white dark:border-slate-200/60 dark:bg-slate-200/80 dark:text-slate-900",
+  complete:
+    "border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-500/25 dark:text-emerald-200",
+  error:
+    "border-rose-200 bg-rose-100 text-rose-700 dark:border-rose-400/40 dark:bg-rose-500/25 dark:text-rose-200",
 };
 
 const progressStateLabels: Record<ProgressStepState, string> = {
@@ -32,10 +43,10 @@ const progressStateLabels: Record<ProgressStepState, string> = {
 };
 
 const progressConnectorToneClasses: Record<ProgressStepState, string> = {
-  idle: "bg-slate-300/70",
-  active: "bg-slate-900/80",
-  complete: "bg-emerald-400",
-  error: "bg-rose-400",
+  idle: "bg-slate-300/70 dark:bg-slate-700/70",
+  active: "bg-slate-900/80 dark:bg-slate-100/80",
+  complete: "bg-emerald-400 dark:bg-emerald-400",
+  error: "bg-rose-400 dark:bg-rose-400",
 };
 
 const progressConnectorScaleClasses: Record<
@@ -191,7 +202,7 @@ type ProgressConnectorProps = {
 
 const ProgressConnector = ({ state }: ProgressConnectorProps) => (
   <div aria-hidden="true" className="flex items-center justify-center self-center">
-    <div className="relative h-6 w-1 rounded-full bg-slate-200/80 lg:hidden">
+    <div className="relative h-6 w-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 lg:hidden">
       <div
         className={cx(
           "absolute inset-0 rounded-full origin-top transition-transform duration-700",
@@ -201,7 +212,7 @@ const ProgressConnector = ({ state }: ProgressConnectorProps) => (
         )}
       />
     </div>
-    <div className="relative hidden h-1 w-12 rounded-full bg-slate-200/80 lg:block">
+    <div className="relative hidden h-1 w-12 rounded-full bg-slate-200/80 dark:bg-slate-800/80 lg:block">
       <div
         className={cx(
           "absolute inset-0 rounded-full origin-left transition-transform duration-700",

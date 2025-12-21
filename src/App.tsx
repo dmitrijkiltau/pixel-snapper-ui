@@ -27,9 +27,12 @@ const HISTORY_KEY = "pixel-snapper-history";
 const HISTORY_LIMIT = 12;
 
 const statusClasses: Record<StatusTone, string> = {
-  info: "border-slate-200 bg-white/80 text-slate-600",
-  success: "border-emerald-200 bg-emerald-50 text-emerald-700",
-  error: "border-rose-200 bg-rose-50 text-rose-700",
+  info:
+    "border-slate-200 bg-white/80 text-slate-600 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300",
+  success:
+    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-500/15 dark:text-emerald-200",
+  error:
+    "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/40 dark:bg-rose-500/15 dark:text-rose-200",
 };
 
 const progressStates: Record<
@@ -376,7 +379,7 @@ const App = () => {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,171,102,0.55),_transparent_55%),radial-gradient(circle_at_80%_25%,_rgba(88,150,255,0.45),_transparent_50%),radial-gradient(circle_at_10%_90%,_rgba(237,91,133,0.35),_transparent_40%)]"></div>
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,171,102,0.55),_transparent_55%),radial-gradient(circle_at_80%_25%,_rgba(88,150,255,0.45),_transparent_50%),radial-gradient(circle_at_10%_90%,_rgba(237,91,133,0.35),_transparent_40%)] dark:bg-[radial-gradient(circle_at_top,_rgba(30,41,59,0.95),_transparent_60%),radial-gradient(circle_at_80%_25%,_rgba(56,189,248,0.2),_transparent_55%),radial-gradient(circle_at_10%_90%,_rgba(248,113,113,0.16),_transparent_45%)]"></div>
       <div className="pointer-events-none absolute inset-0 opacity-40 pixel-grid"></div>
 
       <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-6 pb-16 pt-12">

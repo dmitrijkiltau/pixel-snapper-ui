@@ -46,7 +46,7 @@ const UploadForm = ({
       action={<StepPill tone="dark" label="Step 1" />}
     />
 
-    <label className="group relative flex cursor-pointer flex-col gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white/70 px-5 py-6 text-sm transition hover:border-slate-500">
+    <label className="group relative flex cursor-pointer flex-col gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white/70 px-5 py-6 text-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:hover:border-slate-500">
       <input
         id="image-input"
         type="file"
@@ -56,9 +56,9 @@ const UploadForm = ({
         className="sr-only"
         onChange={onFileChange}
       />
-      <span className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">Image</span>
-      <span className="text-base font-semibold text-slate-900">Drop a file or click to browse</span>
-      <span id="file-name" className="font-[var(--font-mono)] text-xs text-slate-500">
+      <span className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Image</span>
+      <span className="text-base font-semibold text-slate-900 dark:text-slate-100">Drop a file or click to browse</span>
+      <span id="file-name" className="font-[var(--font-mono)] text-xs text-slate-500 dark:text-slate-400">
         {uploadFileName}
       </span>
       {uploadPreviewUrl ? (
@@ -72,7 +72,7 @@ const UploadForm = ({
     </label>
 
     <div className="grid gap-4 sm:grid-cols-2">
-      <label className="flex flex-col gap-2 text-sm font-semibold text-slate-800">
+      <label className="flex flex-col gap-2 text-sm font-semibold text-slate-800 dark:text-slate-200">
         <span>Palette size</span>
         <input
           type="number"
@@ -81,11 +81,11 @@ const UploadForm = ({
           max="256"
           value={kColorsValue}
           onChange={(event) => onKColorsChange(event.target.value)}
-          className="rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+          className="rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-slate-200 dark:focus:ring-slate-200/20"
         />
-        <span className="text-xs font-normal text-slate-500">1 to 256 colors.</span>
+        <span className="text-xs font-normal text-slate-500 dark:text-slate-400">1 to 256 colors.</span>
       </label>
-      <label className="flex flex-col gap-2 text-sm font-semibold text-slate-800">
+      <label className="flex flex-col gap-2 text-sm font-semibold text-slate-800 dark:text-slate-200">
         <span>Seed</span>
         <input
           type="number"
@@ -93,9 +93,9 @@ const UploadForm = ({
           min="0"
           value={kSeedValue}
           onChange={(event) => onKSeedChange(event.target.value)}
-          className="rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10"
+          className="rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-slate-200 dark:focus:ring-slate-200/20"
         />
-        <span className="text-xs font-normal text-slate-500">Keep results deterministic.</span>
+        <span className="text-xs font-normal text-slate-500 dark:text-slate-400">Keep results deterministic.</span>
       </label>
     </div>
 
