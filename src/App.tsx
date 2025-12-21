@@ -313,6 +313,54 @@ const App = () => {
     () => ({ ...progressConfig.steps, ...(progressOverrides.steps || {}) }),
     [progressConfig.steps, progressOverrides.steps]
   );
+  const progressDetails = useMemo(() => {
+    const snapConfig = `${kColorsValue} colors, seed ${kSeedValue}`;
+    const uploadDetail =
+      progressSteps.upload === "error"
+        ? "Image required"
+        : selectedFile
+          ? "Image locked in"
+          : "Choose an image to begin";
+    const queueDetail =
+      progressSteps.queue === "complete"
+        ? "Settings verified"
+        : progressSteps.queue === "active"
+          ? "Checking palette settings"
+          : progressSteps.queue === "error"
+            ? "Fix palette settings"
+            : "Waiting on upload";
+    const snapDetail =
+      progressSteps.snap === "complete"
+        ? `Snapped at ${snapConfig}`
+        : progressSteps.snap === "active"
+          ? `Snapping to ${snapConfig}`
+          : progressSteps.snap === "error"
+            ? "Snap failed. Check settings."
+            : `Ready for ${snapConfig}`;
+    const readyDetail =
+      progressSteps.ready === "complete"
+        ? "Download ready"
+        : progressSteps.ready === "active"
+          ? "Packaging download"
+          : progressSteps.ready === "error"
+            ? "Download failed"
+            : "Awaiting snap";
+
+    return {
+      upload: uploadDetail,
+      queue: queueDetail,
+      snap: snapDetail,
+      ready: readyDetail,
+    };
+  }, [
+    kColorsValue,
+    kSeedValue,
+    progressSteps.queue,
+    progressSteps.ready,
+    progressSteps.snap,
+    progressSteps.upload,
+    selectedFile,
+  ]);
 
   const statusClassName = cx(
     "rounded-2xl border px-4 py-3 text-sm font-semibold",
@@ -334,7 +382,12 @@ const App = () => {
       <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-6 pb-16 pt-12">
         <HeroHeader />
 
-        <ProgressSection label={progressLabel} tone={progressTone} steps={progressSteps} />
+        <ProgressSection
+          label={progressLabel}
+          tone={progressTone}
+          steps={progressSteps}
+          details={progressDetails}
+        />
 
         <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <UploadForm

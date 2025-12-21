@@ -24,7 +24,7 @@ const HeroHeader = () => (
         <TagPill key={tag} label={tag} />
       ))}
     </div>
-    <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+    <div className="grid gap-6 items-center lg:grid-cols-[1.1fr_0.9fr]">
       <div className="flex flex-col gap-5">
         <h1 className="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">
           Pixel Snapper

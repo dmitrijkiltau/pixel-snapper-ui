@@ -103,16 +103,6 @@ const UploadForm = ({
       <button id="snap-button" type="submit" className="btn-primary" disabled={isLoading}>
         Snap pixels
       </button>
-      <div
-        id="busy"
-        className={cx(
-          "items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-slate-500",
-          !isLoading && "hidden"
-        )}
-      >
-        <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-amber-500"></span>
-        Processing
-      </div>
     </div>
 
     <div id="status" className={statusClassName} aria-live="polite">
