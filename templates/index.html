@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pixel Snapper</title>
+
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap"
+  rel="stylesheet"
+/>
+
+<script src="https://unpkg.com/htmx.org@1.9.12"></script>
+
+
+<link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+<main class="wrap">
+<header class="header">
+<h1>Pixel Snapper</h1>
+<p>Upload → snap to grid → get a cleaner pixel-art image. Because pixels deserve boundaries.</p>
+</header>
+
+
+<section class="card">
+<form
+id="snap-form"
+class="form"
+hx-post="/process"
+hx-encoding="multipart/form-data"
+hx-target="#result"
+hx-swap="innerHTML"
+hx-indicator="#busy"
+>
+<div class="grid">
+<label class="field">
+<span>Image</span>
+<input type="file" name="image" accept="image/*" required />
+</label>
+
+
+<label class="field">
+<span>k_colors</span>
+<input type="number" name="k_colors" min="1" max="256" value="16" />
+</label>
+
+
+<label class="field">
+<span>k_seed</span>
+<input type="number" name="k_seed" min="0" value="42" />
+</label>
+</div>
+
+
+<div class="actions">
+<button type="submit" class="btn">Snap</button>
+<div id="busy" class="busy htmx-indicator">Processing…</div>
+</div>
+</form>
+</section>
+
+
+<section class="card">
+<h2>Result</h2>
+<div id="result" class="result">
+<p class="muted">Upload an image and click Snap.</p>
+</div>
+</section>
+
+
+<footer class="footer">
+<p class="muted">Tip: For best results, feed it AI pixel outputs and let it enforce the grid.</p>
+</footer>
+</main>
+
+
+<script>
+// HTMX receives the PNG response as a full response body.
+// Browsers can’t directly inject binary image bytes into a div.
+// So we intercept the response and display it as an object URL.
+
+let activePreviewUrl = null;
+
+document.body.addEventListener('htmx:beforeSwap', function (evt) {
+const xhr = evt.detail.xhr;
+if (!xhr) {
+return;
+}
+const contentType = xhr.getResponseHeader('Content-Type') || '';
+
+
+if (contentType.includes('image/png')) {
+evt.detail.shouldSwap = false;
+
+if (activePreviewUrl) {
+URL.revokeObjectURL(activePreviewUrl);
+activePreviewUrl = null;
+}
+
+const blob = new Blob([xhr.response], { type: 'image/png' });
+const url = URL.createObjectURL(blob);
+activePreviewUrl = url;
+
+
+const result = document.querySelector('#result');
+result.innerHTML = `
+<div class="preview">
+<img src="${url}" alt="Snapped result" />
+</div>
+<a class="link" href="${url}" download="snapped.png">Download snapped.png</a>
+`;
+}
+});
+
+
+// Ensure XHR uses arraybuffer so we can build a Blob
+document.body.addEventListener('htmx:beforeRequest', function (evt) {
+const xhr = evt.detail.xhr;
+const elt = evt.detail.elt;
+const form = elt && elt.closest ? elt.closest('#snap-form') : null;
+if (!xhr || !form) {
+return;
+}
+xhr.responseType = 'arraybuffer';
+});
+</script>
+</body>
+</html>
