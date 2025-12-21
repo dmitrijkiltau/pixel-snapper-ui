@@ -1,6 +1,5 @@
 import math
 import random
-from collections import Counter
 from dataclasses import dataclass
 from typing import List, Tuple, Optional
 
@@ -71,7 +70,7 @@ def quantize_image(img: np.ndarray, cfg: Config) -> np.ndarray:
 
     # Lloyd iterations
     for _ in range(cfg.max_kmeans_iterations):
-        distances = np.linalg.norm(rgb[:, None] - centroids[None, :], axis=2)
+        distances = np.sum((rgb[:, None] - centroids[None, :]) ** 2, axis=2)
         labels = distances.argmin(axis=1)
 
         new_centroids = []
@@ -90,7 +89,7 @@ def quantize_image(img: np.ndarray, cfg: Config) -> np.ndarray:
     # Apply palette
     out = img.copy()
     rgb_all = pixels[:, :3].astype(np.float32)
-    distances = np.linalg.norm(rgb_all[:, None] - centroids[None, :], axis=2)
+    distances = np.sum((rgb_all[:, None] - centroids[None, :]) ** 2, axis=2)
     best = distances.argmin(axis=1)
     pixels[:, :3] = centroids[best].round().astype(np.uint8)
     out[:] = pixels.reshape(img.shape)
@@ -191,6 +190,12 @@ def walk(profile: List[float], step: float, limit: int, cfg: Config) -> List[int
 # Resampling
 # ---------------------------
 
+def _block_mode(block: np.ndarray) -> np.ndarray:
+    # np.unique(axis=0) avoids dtype view edge-cases with 0d arrays.
+    uniq, counts = np.unique(block, axis=0, return_counts=True)
+    return uniq[counts.argmax()]
+
+
 def resample(img: np.ndarray, cols: List[int], rows: List[int]) -> np.ndarray:
     out = np.zeros((len(rows) - 1, len(cols) - 1, 4), dtype=np.uint8)
 
@@ -199,7 +204,7 @@ def resample(img: np.ndarray, cols: List[int], rows: List[int]) -> np.ndarray:
             block = img[y0:y1, x0:x1].reshape(-1, 4)
             if len(block) == 0:
                 continue
-            out[yi, xi] = Counter(map(tuple, block)).most_common(1)[0][0]
+            out[yi, xi] = _block_mode(block)
 
     return out
 
@@ -277,4 +282,3 @@ if __name__ == "__main__":
         cfg.k_colors = int(sys.argv[3])
 
     process_image(sys.argv[1], sys.argv[2], cfg)
-
