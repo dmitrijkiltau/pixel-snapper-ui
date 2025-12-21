@@ -3,9 +3,18 @@ import { TagPill } from "./shared";
 const heroTags = ["Pixel Lab", "Vite + Tailwind 4", "TSX"];
 
 const howItWorksSteps = [
-  "Cluster colors with K-means so the palette stays tight.",
-  "Snap every pixel onto a grid to remove jitter.",
-  "Download the cleaned PNG with no extra clicks.",
+  {
+    title: "Quantize the palette",
+    description: "K-means clustering keeps colors tight to the size you choose.",
+  },
+  {
+    title: "Lock to the grid",
+    description: "Every pixel snaps to a clean grid to remove jitter.",
+  },
+  {
+    title: "Grab the PNG",
+    description: "Download the processed image as a PNG file.",
+  },
 ];
 
 const HeroHeader = () => (
@@ -25,15 +34,31 @@ const HeroHeader = () => (
           Upload a source image, pick your palette size, and get a crisp pixel-perfect render with strict grid alignment.
         </p>
       </div>
-      <div className="panel-card flex flex-col gap-4">
-        <div className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">
-          How it works
+      <div className="panel-card relative flex flex-col gap-5 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 pixel-grid opacity-40"></div>
+          <div className="absolute -right-16 -top-20 h-40 w-40 rounded-full bg-amber-200/40 blur-3xl"></div>
+          <div className="absolute -bottom-16 -left-16 h-40 w-40 rounded-full bg-sky-200/40 blur-3xl"></div>
         </div>
-        <ol className="space-y-3 text-sm text-slate-700">
-          {howItWorksSteps.map((step) => (
-            <li key={step} className="flex gap-3">
-              <span className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full bg-slate-900"></span>
-              {step}
+        <div className="relative flex items-center justify-between">
+          <div className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500">
+            How it works
+          </div>
+          <span className="step-pill bg-slate-900/10 text-slate-700">3 steps</span>
+        </div>
+        <ol className="relative flex flex-col gap-3 text-sm text-slate-700">
+          {howItWorksSteps.map((step, index) => (
+            <li
+              key={step.title}
+              className="flex gap-3 rounded-2xl border border-slate-200/80 bg-white/75 p-3 shadow-sm"
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-xs font-semibold text-white">
+                {String(index + 1).padStart(2, "0")}
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm font-semibold text-slate-900">{step.title}</span>
+                <span className="text-xs text-slate-600">{step.description}</span>
+              </div>
             </li>
           ))}
         </ol>
