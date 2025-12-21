@@ -70,27 +70,25 @@
 
   .preview-viewport {
     overflow: auto;
+    max-height: 420px;
   }
 
   .preview-image {
     transform-origin: top left;
-  }
-
-  .preview-image {
     display: block;
     height: auto;
-    width: 100%;
     max-width: 100%;
+    margin-left: 50%;
+    transform: translateX(-50%);
   }
 
   [data-preview-scale="2"] .preview-image {
-    width: 200%;
-    max-width: 200%;
+    width: 100%;
   }
 
   [data-preview-scale="3"] .preview-image {
-    width: 300%;
-    max-width: 300%;
+    width: 150%;
+    max-width: 150%;
   }
 }
 
