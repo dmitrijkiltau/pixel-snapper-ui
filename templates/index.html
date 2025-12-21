@@ -119,13 +119,23 @@
               <span class="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Step 2</span>
             </div>
 
-            <div
-              id="result"
-              class="flex min-h-[280px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-center text-sm text-slate-500"
-              aria-live="polite"
-            >
-              <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-400">Awaiting</span>
-              <p>Upload an image and hit Snap.</p>
+            <div class="flex flex-col gap-4">
+              <div
+                id="upload-preview"
+                class="flex min-h-[220px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-center text-sm text-slate-500"
+                aria-live="polite"
+              >
+                <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-400">Preview</span>
+                <p>Pick an image to see it here.</p>
+              </div>
+              <div
+                id="result"
+                class="flex min-h-[280px] flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-center text-sm text-slate-500"
+                aria-live="polite"
+              >
+                <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-400">Awaiting</span>
+                <p>Upload an image and hit Snap.</p>
+              </div>
             </div>
 
             <div class="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-3 text-xs text-slate-500">
@@ -134,7 +144,26 @@
           </section>
         </section>
 
-        <footer class="flex flex-col gap-2 text-xs text-slate-500 reveal" style="animation-delay: 280ms">
+        <section class="glass-card flex flex-col gap-5 rounded-3xl p-6 reveal" style="animation-delay: 260ms">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg font-semibold">History</h2>
+              <p class="text-sm text-slate-500">Saved locally for quick downloads.</p>
+            </div>
+            <span class="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Local</span>
+          </div>
+
+          <div id="history" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite">
+            <div
+              class="col-span-full flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-slate-300 bg-white/70 p-6 text-center text-sm text-slate-500"
+            >
+              <span class="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-400">No history yet</span>
+              <p>Snapped images saved here for quick download.</p>
+            </div>
+          </div>
+        </section>
+
+        <footer class="flex flex-col gap-2 text-xs text-slate-500 reveal" style="animation-delay: 320ms">
           <span class="font-semibold uppercase tracking-[0.3em] text-slate-400">Pixel Snapper</span>
           <span>Made for clean edges, crunchy dithers, and deliberate palettes.</span>
         </footer>
