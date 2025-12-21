@@ -28,7 +28,27 @@
   }
 
   .glass-card {
-    @apply border border-slate-200/70 bg-white/75 shadow-[0_20px_60px_-35px_rgba(15,23,42,0.65)] backdrop-blur;
+    border: 1px solid rgb(226 232 240 / 0.7);
+    background-color: rgb(255 255 255 / 0.75);
+    box-shadow: 0 20px 60px -35px rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
+  }
+
+  .panel-card {
+    border: 1px solid rgb(226 232 240 / 0.7);
+    background-color: rgb(255 255 255 / 0.75);
+    box-shadow: 0 20px 60px -35px rgba(15, 23, 42, 0.65);
+    backdrop-filter: blur(8px);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .tag-pill {
+    @apply rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500;
+  }
+
+  .step-pill {
+    @apply rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em];
   }
 
   .btn-primary {
