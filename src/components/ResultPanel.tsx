@@ -27,7 +27,7 @@ const PreviewScaleSelector = ({ value, onChange }: PreviewScaleSelectorProps) =>
           onClick={() => onChange(option)}
           aria-pressed={isActive}
           className={cx(
-            "rounded-full border px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.2em] shadow-sm",
+            "rounded-full px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.2em]",
             isActive ? previewScaleClasses.active : previewScaleClasses.inactive
           )}
         >
