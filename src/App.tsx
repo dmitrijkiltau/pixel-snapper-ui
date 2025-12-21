@@ -54,7 +54,7 @@ const progressStates: Record<
     steps: { upload: "complete", queue: "idle", snap: "idle", ready: "idle" },
   },
   processing: {
-    label: "Processing",
+    label: "Snapping pixels",
     tone: "active",
     steps: { upload: "complete", queue: "complete", snap: "active", ready: "idle" },
   },

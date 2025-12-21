@@ -160,41 +160,53 @@ type ProgressStepProps = {
   detail: string;
 };
 
-const ProgressStep = ({ stepKey, label, icon, state, detail }: ProgressStepProps) => (
-  <div
-    id={`progress-step-${stepKey}`}
-    aria-current={state === "active" ? "step" : undefined}
-    className={cx(
-      "group flex h-full flex-1 flex-col justify-between gap-4 rounded-2xl border px-4 py-4 text-left transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-30px_rgba(15,23,42,0.7)]",
-      progressStepClasses[state]
-    )}
-  >
-    <div className="flex items-start gap-3">
-      <div
-        className={cx(
-          "flex h-11 w-11 items-center justify-center",
-          state === "active" && "motion-safe:animate-pulse"
-        )}
-      >
-        {icon}
-      </div>
-      <div className="flex flex-col gap-1">
-        <span className="text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-current opacity-70">
-          {label}
-        </span>
-        <p className="text-sm font-semibold leading-snug text-current">{detail}</p>
-      </div>
-    </div>
-    <span
+const ProgressStep = ({ stepKey, label, icon, state, detail }: ProgressStepProps) => {
+  const isSnapActive = stepKey === "snap" && state === "active";
+
+  return (
+    <div
+      id={`progress-step-${stepKey}`}
+      aria-current={state === "active" ? "step" : undefined}
       className={cx(
-        "self-start rounded-full border px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.25em]",
-        progressBadgeClasses[state]
+        "group relative flex h-full flex-1 flex-col justify-between gap-4 rounded-2xl border px-4 py-4 text-left transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-30px_rgba(15,23,42,0.7)]",
+        progressStepClasses[state],
+        isSnapActive &&
+          "ring-2 ring-amber-400/70 shadow-[0_20px_45px_-28px_rgba(251,191,36,0.65)]"
       )}
     >
-      {progressStateLabels[state]}
-    </span>
-  </div>
-);
+      {isSnapActive ? (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-4 top-3 h-1 rounded-full bg-amber-400/80 shadow-[0_0_12px_rgba(251,191,36,0.7)] motion-safe:animate-pulse"
+        />
+      ) : null}
+      <div className="flex items-start gap-3">
+        <div
+          className={cx(
+            "flex h-11 w-11 items-center justify-center",
+            state === "active" && "motion-safe:animate-pulse"
+          )}
+        >
+          {icon}
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className="text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-current opacity-70">
+            {label}
+          </span>
+          <p className="text-sm font-semibold leading-snug text-current">{detail}</p>
+        </div>
+      </div>
+      <span
+        className={cx(
+          "self-start rounded-full border px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.25em]",
+          progressBadgeClasses[state]
+        )}
+      >
+        {progressStateLabels[state]}
+      </span>
+    </div>
+  );
+};
 
 type ProgressConnectorProps = {
   state: ProgressStepState;
@@ -232,47 +244,77 @@ type ProgressSectionProps = {
   details?: Partial<Record<ProgressStepKey, string>>;
 };
 
-const ProgressSection = ({ label, tone, steps, details = {} }: ProgressSectionProps) => (
-  <section className="panel-card flex flex-col gap-4 reveal" style={{ animationDelay: "140ms" }}>
-    <SectionHeader
-      title="Progress"
-      subtitle="A live timeline while the snap runs."
-      action={(
-        <span
-          id="progress-status"
-          className={cx(
-            "rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]",
-            progressStatusClasses[tone]
-          )}
-          aria-live="polite"
-        >
-          {label}
-        </span>
-      )}
-    />
+const ProgressSection = ({ label, tone, steps, details = {} }: ProgressSectionProps) => {
+  const snapState = steps.snap;
+  const snapDetail = details.snap ?? progressFallbackDetails.snap;
+  const showSnapCallout = snapState === "active";
 
-    <div className="flex flex-col gap-3 lg:flex-row lg:items-stretch lg:gap-3">
-      {progressStepMeta.map((step, index) => {
-        const state = steps[step.key];
-        const detail = details[step.key] ?? progressFallbackDetails[step.key];
+  return (
+    <section className="panel-card flex flex-col gap-4 reveal" style={{ animationDelay: "140ms" }}>
+      <SectionHeader
+        title="Progress"
+        subtitle="A live timeline while the snap runs."
+        action={(
+          <span
+            id="progress-status"
+            className={cx(
+              "rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]",
+              progressStatusClasses[tone]
+            )}
+            aria-live="polite"
+          >
+            {label}
+          </span>
+        )}
+      />
 
-        return (
-          <Fragment key={step.key}>
-            <ProgressStep
-              stepKey={step.key}
-              label={step.label}
-              icon={step.icon}
-              state={state}
-              detail={detail}
-            />
-            {index < progressStepMeta.length - 1 ? (
-              <ProgressConnector state={state} />
-            ) : null}
-          </Fragment>
-        );
-      })}
-    </div>
-  </section>
-);
+      {showSnapCallout ? (
+        <div className="relative overflow-hidden rounded-2xl border border-amber-200/80 bg-amber-50/80 px-4 py-3 text-amber-900 shadow-[0_16px_30px_-20px_rgba(251,191,36,0.5)] dark:border-amber-400/30 dark:bg-amber-500/15 dark:text-amber-100">
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-col gap-1">
+              <span className="text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-amber-700/80 dark:text-amber-100/70">
+                Snap in progress
+              </span>
+              <span className="text-sm font-semibold text-current">{snapDetail}</span>
+            </div>
+            <span className="flex items-center gap-2 rounded-full border border-amber-300/70 bg-amber-100/80 px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.25em] text-amber-800 dark:border-amber-400/40 dark:bg-amber-400/20 dark:text-amber-100">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60 motion-safe:animate-ping" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
+              </span>
+              Live
+            </span>
+          </div>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(251,191,36,0.35),transparent_60%)]"
+          />
+        </div>
+      ) : null}
+
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-stretch lg:gap-3">
+        {progressStepMeta.map((step, index) => {
+          const state = steps[step.key];
+          const detail = details[step.key] ?? progressFallbackDetails[step.key];
+
+          return (
+            <Fragment key={step.key}>
+              <ProgressStep
+                stepKey={step.key}
+                label={step.label}
+                icon={step.icon}
+                state={state}
+                detail={detail}
+              />
+              {index < progressStepMeta.length - 1 ? (
+                <ProgressConnector state={state} />
+              ) : null}
+            </Fragment>
+          );
+        })}
+      </div>
+    </section>
+  );
+};
 
 export default ProgressSection;
