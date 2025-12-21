@@ -39,7 +39,7 @@ def process():
 
     output_png = process_rgba_bytes(input_bytes, k_colors=k_colors, k_seed=k_seed)
 
-    # Return bytes as a file response. HTMX will fetch this in a separate request via the preview URL.
+    # Return bytes as a file response so the frontend can render the PNG blob.
     return send_file(
         io.BytesIO(output_png),
         mimetype="image/png",
@@ -51,4 +51,3 @@ def process():
 if __name__ == "__main__":
     # Debug server. For real use: gunicorn.
     app.run(host="0.0.0.0", port=8000, debug=True)
-

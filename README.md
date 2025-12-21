@@ -5,8 +5,17 @@
   python -m venv .venv
   source .venv/bin/activate
   pip install -r requirements.txt
+  npm install
+  npm run build
   python app.py
 ```
+
+## Frontend dev (Vite)
+```bash
+  python app.py
+  npm run dev
+```
+Vite proxies `/process` to the Flask server on port 8000.
 
 ## Docker
 ```bash
