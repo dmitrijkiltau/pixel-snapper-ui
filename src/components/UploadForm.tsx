@@ -71,6 +71,15 @@ const UploadForm = ({
       ) : null}
     </label>
 
+    <div className="flex items-start gap-2 rounded-xl border border-slate-200/60 bg-slate-50/50 px-3 py-2.5 text-xs text-slate-500 dark:border-slate-700/60 dark:bg-slate-800/30 dark:text-slate-400">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5 shrink-0 text-slate-400 dark:text-slate-500">
+        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
+        <path d="M12 17V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <circle cx="1" cy="1" r="1" transform="matrix(1 0 0 -1 11 9)" fill="currentColor"/>
+      </svg>
+      <em>AI pixel outputs snap best when they are slightly oversized.</em>
+    </div>
+
     <div className="grid gap-4 sm:grid-cols-2">
       <label className="flex flex-col gap-2 text-sm font-semibold text-slate-800 dark:text-slate-200">
         <span>Palette size</span>

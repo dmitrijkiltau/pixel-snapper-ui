@@ -1220,15 +1220,6 @@ const ResultPanel = ({
         </div>
       </div>
 
-      <div className="flex items-start gap-2 rounded-xl border border-slate-200/60 bg-slate-50/50 px-3 py-2.5 text-xs text-slate-500 dark:border-slate-700/60 dark:bg-slate-800/30 dark:text-slate-400">
-        <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-slate-400 dark:text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 16v-4" />
-          <path d="M12 8h.01" />
-        </svg>
-        <span>AI pixel outputs snap best when they are slightly oversized.</span>
-      </div>
-
       {canRestore ? (
         <dialog
           ref={restoreDialogRef}
