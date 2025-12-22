@@ -7,6 +7,11 @@ const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 8;
 const PALETTE_SIZE = 10;
 
+type PaletteEntry = {
+  color: string;
+  percentage: number;
+};
+
 const IconUndo = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5">
     <path d="M4 7H15C16.8692 7 17.8039 7 18.5 7.40193C18.9561 7.66523 19.3348 8.04394 19.5981 8.49999C20 9.19615 20 10.1308 20 12C20 13.8692 20 14.8038 19.5981 15.5C19.3348 15.9561 18.9561 16.3348 18.5 16.5981C17.8039 17 16.8692 17 15 17H8.00001M4 7L7 4M4 7L7 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -115,12 +120,19 @@ const hexToRgb = (hex: string) => {
   };
 };
 
-const normalizePalette = (colors: string[], size: number, fallback: string) => {
-  const next = colors.slice(0, size);
+const normalizePalette = (entries: PaletteEntry[], size: number, fallbackColor: string) => {
+  const next = entries.slice(0, size);
   while (next.length < size) {
-    next.push(fallback);
+    next.push({ color: fallbackColor, percentage: 0 });
   }
   return next;
+};
+
+const formatPercentage = (value: number) => {
+  if (!Number.isFinite(value)) {
+    return "0.00%";
+  }
+  return `${value.toFixed(2)}%`;
 };
 
 type ResultPanelProps = {
@@ -211,9 +223,11 @@ const ResultPanel = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editTool, setEditTool] = useState<"paint" | "erase" | "fill">("paint");
   const [brushColor, setBrushColor] = useState("#0f172a");
-  const [palette, setPalette] = useState<string[]>(
-    Array.from({ length: PALETTE_SIZE }, () => "#0f172a")
+  const [palette, setPalette] = useState<PaletteEntry[]>(
+    Array.from({ length: PALETTE_SIZE }, () => ({ color: "#0f172a", percentage: 0 }))
   );
+  const [copiedColor, setCopiedColor] = useState<string | null>(null);
+  const copyTimeoutRef = useRef<number | null>(null);
   const [isPainting, setIsPainting] = useState(false);
   const [hasPendingEdits, setHasPendingEdits] = useState(false);
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(
@@ -242,7 +256,9 @@ const ResultPanel = ({
     setIsEditing(false);
     setIsPainting(false);
     setHasPendingEdits(false);
-    setPalette(Array.from({ length: PALETTE_SIZE }, () => "#0f172a"));
+    setPalette(
+      Array.from({ length: PALETTE_SIZE }, () => ({ color: "#0f172a", percentage: 0 }))
+    );
     setShowHelp(false);
     setShowMoreMenu(false);
     dragState.current = null;
@@ -264,6 +280,14 @@ const ResultPanel = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showMoreMenu]);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimeoutRef.current) {
+        window.clearTimeout(copyTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const resultWidth = resultDimensions?.width ?? null;
   const resultHeight = resultDimensions?.height ?? null;
@@ -373,7 +397,7 @@ const ResultPanel = ({
   const previewBackgroundColor =
     previewBackground === "dark" ? "rgba(15, 23, 42, 0.9)" : "rgba(255, 255, 255, 0.85)";
 
-  function extractPaletteFromCanvas(canvas: HTMLCanvasElement) {
+  function extractPaletteFromCanvas(canvas: HTMLCanvasElement): PaletteEntry[] {
     const ctx = getCanvasContext(canvas);
     if (!ctx) {
       return [];
@@ -384,6 +408,7 @@ const ResultPanel = ({
     }
     const data = ctx.getImageData(0, 0, width, height).data;
     const counts = new Map<string, number>();
+    let total = 0;
     for (let i = 0; i < data.length; i += 4) {
       const alpha = data[i + 3];
       if (alpha === 0) {
@@ -391,11 +416,15 @@ const ResultPanel = ({
       }
       const hex = `#${toHex(data[i])}${toHex(data[i + 1])}${toHex(data[i + 2])}`;
       counts.set(hex, (counts.get(hex) ?? 0) + 1);
+      total += 1;
     }
     return Array.from(counts.entries())
       .sort((a, b) => b[1] - a[1])
       .slice(0, PALETTE_SIZE)
-      .map(([hex]) => hex);
+      .map(([hex, count]) => ({
+        color: hex,
+        percentage: total > 0 ? (count / total) * 100 : 0,
+      }));
   }
 
   function refreshPaletteFromCanvas() {
@@ -408,7 +437,11 @@ const ResultPanel = ({
     }
     const extracted = extractPaletteFromCanvas(canvas);
     setPalette((prev) =>
-      normalizePalette(extracted, PALETTE_SIZE, prev[0] ?? brushColor)
+      normalizePalette(
+        extracted,
+        PALETTE_SIZE,
+        prev[0]?.color ?? brushColor
+      )
     );
   }
 
@@ -602,20 +635,37 @@ const ResultPanel = ({
     applyHistoryEntry(nextUrl);
   };
 
-  const copyPaletteColor = async (color: string) => {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(color);
-      return;
+  const showCopyFeedback = (color: string) => {
+    setCopiedColor(color);
+    if (copyTimeoutRef.current) {
+      window.clearTimeout(copyTimeoutRef.current);
     }
-    const textarea = document.createElement("textarea");
-    textarea.value = color;
-    textarea.setAttribute("readonly", "true");
-    textarea.style.position = "absolute";
-    textarea.style.left = "-9999px";
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand("copy");
-    textarea.remove();
+    copyTimeoutRef.current = window.setTimeout(() => {
+      setCopiedColor(null);
+      copyTimeoutRef.current = null;
+    }, 1500);
+  };
+
+  const copyPaletteColor = async (color: string) => {
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(color);
+      } else {
+        const textarea = document.createElement("textarea");
+        textarea.value = color;
+        textarea.setAttribute("readonly", "true");
+        textarea.style.position = "absolute";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+      }
+    } catch {
+      // ignore copy failures, still show feedback
+    } finally {
+      showCopyFeedback(color);
+    }
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -1151,14 +1201,15 @@ const ResultPanel = ({
                   Palette
                 </span>
                 <div className="flex flex-wrap items-center gap-2">
-                  {palette.map((color, index) => {
+                  {palette.map((entry, index) => {
+                    const { color, percentage } = entry;
                     if (!isEditing) {
                       return (
                         <button
                           key={`${color}-${index}`}
                           type="button"
                           onClick={() => copyPaletteColor(color)}
-                          className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1 text-[0.55rem] font-medium text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100"
+                          className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-2 py-1 text-[0.55rem] font-medium text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100"
                           aria-label={`Copy palette color ${color}`}
                           title="Copy hex"
                         >
@@ -1166,7 +1217,12 @@ const ResultPanel = ({
                             className="h-4 w-4 rounded-full border border-slate-200 dark:border-slate-700"
                             style={{ backgroundColor: color }}
                           />
-                          <span>{color}</span>
+                          <span className="flex items-center gap-1">
+                            <span>{copiedColor === color ? "Copied" : color}</span>
+                            <span className="rounded-full border border-slate-200/80 bg-slate-100 px-2 py-0.5 text-[0.55rem] font-semibold text-slate-600 dark:border-slate-700/80 dark:bg-slate-800/60 dark:text-slate-200">
+                              {formatPercentage(percentage)}
+                            </span>
+                          </span>
                         </button>
                       );
                     }
