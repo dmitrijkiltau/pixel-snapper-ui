@@ -834,17 +834,17 @@ const ResultPanel = ({
       </div>
 
       {showHelp && hasResult ? (
-        <div className="flex flex-wrap gap-2 text-[0.6rem] text-slate-500 dark:text-slate-400">
-          <span className="tag-pill">Scroll to zoom</span>
-          <span className="tag-pill">Right-click or drag to pan</span>
-          {isEditing ? (
-            <>
-              <span className="tag-pill">
-                Click to {editTool === "fill" ? "fill" : editTool === "erase" ? "erase" : "paint"}
-              </span>
-              <span className="tag-pill">Alt+click to sample color</span>
-            </>
-          ) : null}
+        <div className="rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-[0.7rem] text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300">
+          <ul className="list-disc space-y-1 pl-4">
+            <li>Scroll to zoom</li>
+            <li>Right-click or drag to pan</li>
+            {isEditing ? (
+              <>
+                <li>Click to {editTool === "fill" ? "fill" : editTool === "erase" ? "erase" : "paint"}</li>
+                <li>Alt+click to sample color</li>
+              </>
+            ) : null}
+          </ul>
         </div>
       ) : null}
 
