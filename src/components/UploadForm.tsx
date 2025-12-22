@@ -3,6 +3,7 @@ import { cx, SectionHeader, StepPill } from "./shared";
 
 type UploadFormProps = {
   isLoading: boolean;
+  canEditInput: boolean;
   uploadFileName: string;
   uploadPreviewUrl: string | null;
   uploadPreviewAlt: string;
@@ -14,10 +15,12 @@ type UploadFormProps = {
   onFileChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onKColorsChange: (value: string) => void;
   onKSeedChange: (value: string) => void;
+  onEditInput: () => void;
 };
 
 const UploadForm = ({
   isLoading,
+  canEditInput,
   uploadFileName,
   uploadPreviewUrl,
   uploadPreviewAlt,
@@ -29,6 +32,7 @@ const UploadForm = ({
   onFileChange,
   onKColorsChange,
   onKSeedChange,
+  onEditInput,
 }: UploadFormProps) => (
   <form
     id="snap-form"
@@ -102,6 +106,14 @@ const UploadForm = ({
     <div className="flex flex-wrap items-center gap-3">
       <button id="snap-button" type="submit" className="btn-primary" disabled={isLoading}>
         Snap pixels
+      </button>
+      <button
+        type="button"
+        onClick={onEditInput}
+        disabled={isLoading || !canEditInput}
+        className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/80 px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:text-slate-900 disabled:cursor-not-allowed disabled:border-slate-200/70 disabled:bg-white/50 disabled:text-slate-400 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-slate-100 dark:disabled:border-slate-700/70 dark:disabled:bg-slate-900/50 dark:disabled:text-slate-500"
+      >
+        Edit without snapping
       </button>
     </div>
 

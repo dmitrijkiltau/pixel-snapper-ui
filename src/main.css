@@ -62,6 +62,20 @@
     padding: 1.5rem;
   }
 
+  .dialog-shell {
+    width: min(90vw, 440px);
+    border: 1px solid rgb(var(--card-border) / 0.8);
+    background-color: rgb(var(--card-bg) / 0.95);
+    box-shadow: 0 20px 60px -35px rgb(var(--card-shadow) / 0.65);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .dialog-shell::backdrop {
+    background-color: rgb(15 23 42 / 0.45);
+    backdrop-filter: blur(4px);
+  }
+
   .tag-pill {
     @apply rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300;
   }

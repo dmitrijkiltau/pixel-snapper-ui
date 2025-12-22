@@ -11,6 +11,7 @@ const clamp = (value: number, min: number, max: number) =>
 type ResultPanelProps = {
   resultId: string | null;
   resultUrl: string | null;
+  resultOriginalUrl: string | null;
   resultDownloadName: string;
   resultDimensions: { width: number; height: number } | null;
   hasEdits: boolean;
@@ -72,6 +73,7 @@ const editHistoryReducer = (state: EditHistoryState, action: EditHistoryAction) 
 const ResultPanel = ({
   resultId,
   resultUrl,
+  resultOriginalUrl,
   resultDownloadName,
   resultDimensions,
   hasEdits,
@@ -95,6 +97,7 @@ const ResultPanel = ({
   });
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const restoreDialogRef = useRef<HTMLDialogElement | null>(null);
   const dragState = useRef<DragState | null>(null);
   const paintState = useRef<PaintState | null>(null);
   const lastLoadedUrlRef = useRef<string | null>(null);
@@ -210,6 +213,7 @@ const ResultPanel = ({
       ? `${resultDimensions.width}x${resultDimensions.height} px`
       : null;
   const hasResult = Boolean(resultUrl);
+  const canRestore = hasEdits && Boolean(resultOriginalUrl);
 
   const getCanvasPoint = (event: ReactPointerEvent<HTMLDivElement>) => {
     const metrics = getViewportMetrics();
@@ -490,6 +494,28 @@ const ResultPanel = ({
     onDiscardEdits();
   };
 
+  const openRestoreDialog = () => {
+    if (!canRestore) {
+      return;
+    }
+    const dialog = restoreDialogRef.current;
+    if (dialog && !dialog.open) {
+      dialog.showModal();
+    }
+  };
+
+  const closeRestoreDialog = () => {
+    const dialog = restoreDialogRef.current;
+    if (dialog?.open) {
+      dialog.close();
+    }
+  };
+
+  const handleRestoreConfirm = () => {
+    handleDiscard();
+    closeRestoreDialog();
+  };
+
   const cursorClassName = hasResult
     ? isEditing
       ? "cursor-crosshair"
@@ -606,10 +632,10 @@ const ResultPanel = ({
           {hasEdits ? (
             <button
               type="button"
-              onClick={handleDiscard}
+              onClick={openRestoreDialog}
               className="inline-flex items-center justify-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-rose-600 transition hover:border-rose-300 hover:text-rose-700 dark:border-rose-400/40 dark:bg-rose-500/15 dark:text-rose-200 dark:hover:border-rose-300/70"
             >
-              Discard edits
+              Restore original
             </button>
           ) : null}
         </div>
@@ -665,6 +691,59 @@ const ResultPanel = ({
       <div className="rounded-2xl border border-slate-200/70 bg-white/70 px-4 py-3 text-xs text-slate-500 dark:border-slate-700/70 dark:bg-slate-900/60 dark:text-slate-300">
         Tip: AI pixel outputs snap best when they are slightly oversized.
       </div>
+
+      {canRestore ? (
+        <dialog
+          ref={restoreDialogRef}
+          className="dialog-shell"
+          aria-labelledby="restore-dialog-title"
+          aria-describedby="restore-dialog-description"
+          onCancel={(event) => {
+            event.preventDefault();
+            closeRestoreDialog();
+          }}
+        >
+          <div className="flex flex-col gap-4">
+            <div className="space-y-2">
+              <p
+                id="restore-dialog-title"
+                className="text-sm font-semibold text-slate-900 dark:text-slate-100"
+              >
+                Restore the original image?
+              </p>
+              <p
+                id="restore-dialog-description"
+                className="text-xs text-slate-500 dark:text-slate-300"
+              >
+                This will replace the current edits with the original image.
+              </p>
+            </div>
+            {resultOriginalUrl ? (
+              <img
+                src={resultOriginalUrl}
+                alt="Original snap preview"
+                className="max-h-48 w-full rounded-2xl border border-slate-200 bg-white/80 object-contain p-3 dark:border-slate-700 dark:bg-slate-900/70"
+              />
+            ) : null}
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeRestoreDialog}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/80 px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-slate-600 transition hover:border-slate-400 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-slate-100"
+              >
+                Keep edits
+              </button>
+              <button
+                type="button"
+                onClick={handleRestoreConfirm}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-rose-600 transition hover:border-rose-300 hover:text-rose-700 dark:border-rose-400/40 dark:bg-rose-500/15 dark:text-rose-200 dark:hover:border-rose-300/70"
+              >
+                Restore original
+              </button>
+            </div>
+          </div>
+        </dialog>
+      ) : null}
     </section>
   );
 };

@@ -97,6 +97,20 @@ const toSafeDownloadName = (originalName: string) => {
   return `snapped-${safeBase}.png`;
 };
 
+const toSafeEditName = (originalName: string) => {
+  if (!originalName || typeof originalName !== "string") {
+    return "edited.png";
+  }
+  const baseName = originalName.replace(/\.[^/.]+$/, "");
+  const safeBase = baseName
+    .replace(/[^a-z0-9-_]+/gi, "-")
+    .replace(/^-+|-+$/g, "");
+  if (!safeBase) {
+    return "edited.png";
+  }
+  return `edited-${safeBase}.png`;
+};
+
 const blobToDataUrl = (blob: Blob) =>
   new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
@@ -371,6 +385,60 @@ const App = () => {
     }
   };
 
+  const handleEditInput = async () => {
+    if (isLoading) {
+      return;
+    }
+    if (!selectedFile) {
+      setStatus("Pick an image before editing.", "error");
+      updateProgress("error", {
+        label: "Image needed",
+        tone: "error",
+        steps: { upload: "error", queue: "idle", snap: "idle", ready: "idle" },
+      });
+      return;
+    }
+
+    setStatus("");
+    setIsLoading(true);
+
+    try {
+      const dataUrl = await blobToDataUrl(selectedFile);
+      let dimensions: { width: number; height: number } | null = null;
+      try {
+        dimensions = await getImageDimensions(selectedFile);
+      } catch {
+        dimensions = null;
+      }
+      const entry: HistoryItem = {
+        id: createId(),
+        dataUrl,
+        originalDataUrl: dataUrl,
+        sourceName: selectedFile.name || "",
+        downloadName: toSafeEditName(selectedFile.name),
+        createdAt: Date.now(),
+        width: dimensions?.width,
+        height: dimensions?.height,
+      };
+      pushHistoryItem(entry);
+      setStatus("Loaded into the editor. Paint without snapping.", "success");
+      updateProgress("ready");
+    } catch (error) {
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : "Could not load this image for editing.";
+      setStatus(message, "error");
+      updateProgress("error", {
+        label: "Load failed",
+        tone: "error",
+        steps: { upload: "complete", queue: "idle", snap: "idle", ready: "idle" },
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const activeResult = useMemo(() => {
     if (!activeHistoryId) {
       return null;
@@ -417,6 +485,11 @@ const App = () => {
           : item
       )
     );
+  };
+
+  const handleSelectHistory = (id: string) => {
+    setActiveHistoryId(id);
+    setStatus("History entry loaded into the editor.", "info");
   };
 
   const progressConfig = progressStates[progressState];
@@ -505,6 +578,7 @@ const App = () => {
         <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <UploadForm
             isLoading={isLoading}
+            canEditInput={Boolean(selectedFile)}
             uploadFileName={uploadFileName}
             uploadPreviewUrl={uploadPreviewUrl}
             uploadPreviewAlt={uploadPreviewAlt}
@@ -516,11 +590,13 @@ const App = () => {
             onFileChange={handleFileChange}
             onKColorsChange={setKColorsValue}
             onKSeedChange={setKSeedValue}
+            onEditInput={handleEditInput}
           />
 
           <ResultPanel
             resultId={activeResult?.id ?? null}
             resultUrl={activeResult?.dataUrl ?? null}
+            resultOriginalUrl={activeResult?.originalDataUrl ?? null}
             resultDownloadName={activeResult?.downloadName ?? "snapped.png"}
             resultDimensions={resultDimensions}
             hasEdits={hasEdits}
@@ -529,7 +605,11 @@ const App = () => {
           />
         </section>
 
-        <HistorySection items={historyItems} />
+        <HistorySection
+          items={historyItems}
+          activeId={activeHistoryId}
+          onSelect={handleSelectHistory}
+        />
 
         <AppFooter />
       </main>
