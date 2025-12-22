@@ -226,8 +226,10 @@ const ResultPanel = ({
   const [palette, setPalette] = useState<PaletteEntry[]>(
     Array.from({ length: PALETTE_SIZE }, () => ({ color: "#0f172a", percentage: 0 }))
   );
-  const [copiedColor, setCopiedColor] = useState<string | null>(null);
-  const copyTimeoutRef = useRef<number | null>(null);
+  const [paletteFeedback, setPaletteFeedback] = useState<{ color: string; label: string } | null>(
+    null
+  );
+  const paletteFeedbackTimeoutRef = useRef<number | null>(null);
   const [isPainting, setIsPainting] = useState(false);
   const [hasPendingEdits, setHasPendingEdits] = useState(false);
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(
@@ -283,8 +285,8 @@ const ResultPanel = ({
 
   useEffect(() => {
     return () => {
-      if (copyTimeoutRef.current) {
-        window.clearTimeout(copyTimeoutRef.current);
+      if (paletteFeedbackTimeoutRef.current) {
+        window.clearTimeout(paletteFeedbackTimeoutRef.current);
       }
     };
   }, []);
@@ -648,14 +650,14 @@ const ResultPanel = ({
     applyHistoryEntry(nextUrl);
   };
 
-  const showCopyFeedback = (color: string) => {
-    setCopiedColor(color);
-    if (copyTimeoutRef.current) {
-      window.clearTimeout(copyTimeoutRef.current);
+  const showPaletteFeedback = (color: string, label: string) => {
+    setPaletteFeedback({ color, label });
+    if (paletteFeedbackTimeoutRef.current) {
+      window.clearTimeout(paletteFeedbackTimeoutRef.current);
     }
-    copyTimeoutRef.current = window.setTimeout(() => {
-      setCopiedColor(null);
-      copyTimeoutRef.current = null;
+    paletteFeedbackTimeoutRef.current = window.setTimeout(() => {
+      setPaletteFeedback(null);
+      paletteFeedbackTimeoutRef.current = null;
     }, 1500);
   };
 
@@ -677,8 +679,17 @@ const ResultPanel = ({
     } catch {
       // ignore copy failures, still show feedback
     } finally {
-      showCopyFeedback(color);
+      showPaletteFeedback(color, "Copied");
     }
+  };
+
+  const handlePaletteSegmentAction = (color: string) => {
+    if (isEditing) {
+      setBrushColor(color);
+      showPaletteFeedback(color, "Brush color set");
+      return;
+    }
+    copyPaletteColor(color);
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -1213,71 +1224,52 @@ const ResultPanel = ({
                 <span className="text-[0.55rem] font-semibold uppercase tracking-[0.35em] text-slate-400 dark:text-slate-500">
                   Palette
                 </span>
-                {!isEditing ? (
-                  <div className="flex flex-col gap-2 px-1 pb-1">
-                    <div className="relative flex h-12 overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100/80 shadow-inner dark:border-slate-700/80 dark:bg-slate-950">
-                      <div className="flex h-full w-full">
-                        {paletteSegments.map((segment, index) => {
-                          if (segment.usageWidth <= 0) {
-                            return null;
-                          }
-                          const isCopied = copiedColor === segment.color;
-                          const usageLabel = formatPercentage(segment.percentage);
-                          const tooltipLabel = isCopied
-                            ? `${usageLabel} • Copied`
-                            : usageLabel;
-                          return (
-                            <button
-                              key={`${segment.color}-${index}`}
-                              type="button"
-                              onClick={() => copyPaletteColor(segment.color)}
-                              className="group relative h-full border-0 p-0 text-transparent transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500"
-                              style={{
-                                width: `${segment.usageWidth}%`,
-                                backgroundColor: segment.color,
-                              }}
-                              title={tooltipLabel}
-                              aria-label={`Copy palette color ${segment.color}`}
-                            >
-                              <span className="pointer-events-none absolute left-1/2 -top-6 -translate-x-1/2 whitespace-nowrap rounded-full border border-slate-900/10 bg-slate-900/80 px-2 py-0.5 text-[0.55rem] font-semibold text-white opacity-0 transition group-hover:opacity-100 dark:border-slate-100/20 dark:bg-slate-50/90 dark:text-slate-900">
-                                {tooltipLabel}
+                <div className="flex flex-col gap-2 px-1 pb-1">
+                  <div className="relative flex h-12 overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100/80 shadow-inner dark:border-slate-700/80 dark:bg-slate-950">
+                    <div className="flex h-full w-full">
+                      {paletteSegments.map((segment, index) => {
+                        if (segment.usageWidth <= 0) {
+                          return null;
+                        }
+                        const usageLabel = formatPercentage(segment.percentage);
+                        const feedbackMatch = paletteFeedback?.color === segment.color;
+                        const actionLabel = isEditing ? "Set brush color" : "Copy palette color";
+                        return (
+                          <button
+                            key={`${segment.color}-${index}`}
+                            type="button"
+                            onClick={() => handlePaletteSegmentAction(segment.color)}
+                            className="group relative h-full border-0 p-0 text-transparent transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500"
+                            style={{
+                              width: `${segment.usageWidth}%`,
+                              backgroundColor: segment.color,
+                            }}
+                            title={`${segment.color} • ${usageLabel}`}
+                            aria-label={`${actionLabel} ${segment.color}`}
+                          >
+                            <div className="pointer-events-none absolute left-1/2 -top-11 flex -translate-x-1/2 flex-col items-center gap-1">
+                              {feedbackMatch && paletteFeedback?.label ? (
+                                <span className="inline-flex items-center rounded-full border border-slate-900/20 bg-slate-900/80 px-2 py-0.5 text-[0.55rem] font-semibold text-white transition-all duration-150 dark:border-slate-100/20 dark:bg-slate-50/90 dark:text-slate-900">
+                                  {paletteFeedback.label}
+                                </span>
+                              ) : null}
+                              <span className="inline-flex items-center rounded-full border border-slate-900/10 bg-white/90 px-2 py-0.5 text-[0.55rem] font-semibold text-slate-900 transition-opacity duration-150 opacity-0 group-hover:opacity-100 dark:border-slate-700/60 dark:bg-slate-900 dark:text-white">
+                                {usageLabel}
                               </span>
-                            </button>
-                          );
-                        })}
-                        {paletteOthersWidth > 0 && (
-                          <div
-                            aria-hidden="true"
-                            className="pointer-events-none h-full bg-gradient-to-r from-white/60 to-white/0 dark:from-slate-900/80 dark:to-slate-900/20"
-                            style={{ width: `${paletteOthersWidth}%` }}
-                          />
-                        )}
-                      </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                      {paletteOthersWidth > 0 && (
+                        <div
+                          aria-hidden="true"
+                          className="pointer-events-none h-full bg-gradient-to-r from-white/60 to-white/0 dark:from-slate-900/80 dark:to-slate-900/20"
+                          style={{ width: `${paletteOthersWidth}%` }}
+                        />
+                      )}
                     </div>
                   </div>
-                ) : (
-                  <div className="flex flex-wrap items-center gap-2">
-                    {palette.map((entry, index) => {
-                      const { color } = entry;
-                      return (
-                        <button
-                          key={`${color}-${index}`}
-                          type="button"
-                          onClick={() => setBrushColor(color)}
-                          className={cx(
-                            "h-7 w-7 rounded-md border transition",
-                            brushColor.toLowerCase() === color.toLowerCase()
-                              ? "border-slate-900 ring-2 ring-slate-900/20 dark:border-slate-100 dark:ring-slate-100/20"
-                              : "border-slate-300 hover:border-slate-400 dark:border-slate-600 dark:hover:border-slate-400"
-                          )}
-                          style={{ backgroundColor: color }}
-                          aria-label={`Select palette color ${index + 1}`}
-                          title={`Select ${color}`}
-                        />
-                      );
-                    })}
-                  </div>
-                )}
+                </div>
               </div>
               <a
                 href={resultUrl}
