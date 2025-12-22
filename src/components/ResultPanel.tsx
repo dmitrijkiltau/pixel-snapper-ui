@@ -1,6 +1,7 @@
 import { useEffect, useReducer, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { cx, SectionHeader, StepPill } from "./shared";
+import type { PreviewBackgroundOption } from "./types";
 
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 8;
@@ -131,6 +132,10 @@ type ResultPanelProps = {
   hasEdits: boolean;
   onCommitEdits: (dataUrl: string) => void;
   onDiscardEdits: () => void;
+  showGrid: boolean;
+  previewBackground: PreviewBackgroundOption;
+  onToggleGrid: () => void;
+  onTogglePreviewBackground: () => void;
   onClearSelection: () => void;
 };
 
@@ -194,6 +199,10 @@ const ResultPanel = ({
   hasEdits,
   onCommitEdits,
   onDiscardEdits,
+  showGrid,
+  previewBackground,
+  onToggleGrid,
+  onTogglePreviewBackground,
   onClearSelection,
 }: ResultPanelProps) => {
   const [zoom, setZoom] = useState(1);
@@ -202,8 +211,6 @@ const ResultPanel = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editTool, setEditTool] = useState<"paint" | "erase" | "fill">("paint");
   const [brushColor, setBrushColor] = useState("#0f172a");
-  const [showGrid, setShowGrid] = useState(false);
-  const [previewBackground, setPreviewBackground] = useState<"light" | "dark">("light");
   const [palette, setPalette] = useState<string[]>(
     Array.from({ length: PALETTE_SIZE }, () => "#0f172a")
   );
@@ -236,8 +243,6 @@ const ResultPanel = ({
     setIsPainting(false);
     setHasPendingEdits(false);
     setPalette(Array.from({ length: PALETTE_SIZE }, () => "#0f172a"));
-    setShowGrid(false);
-    setPreviewBackground("light");
     setShowHelp(false);
     setShowMoreMenu(false);
     dragState.current = null;
@@ -1079,7 +1084,7 @@ const ResultPanel = ({
                 <div className="pointer-events-none absolute right-3 top-3 z-10 flex items-center gap-2 opacity-0 transition group-hover:opacity-100">
                   <button
                     type="button"
-                    onClick={() => setShowGrid((prev) => !prev)}
+                    onClick={onToggleGrid}
                     onPointerDown={(event) => event.stopPropagation()}
                     onPointerUp={(event) => event.stopPropagation()}
                     className={cx(
@@ -1097,9 +1102,7 @@ const ResultPanel = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() =>
-                      setPreviewBackground((prev) => (prev === "light" ? "dark" : "light"))
-                    }
+                    onClick={onTogglePreviewBackground}
                     onPointerDown={(event) => event.stopPropagation()}
                     onPointerUp={(event) => event.stopPropagation()}
                     className="pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-500 shadow-sm transition hover:text-slate-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:text-slate-100"

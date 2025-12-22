@@ -9,6 +9,7 @@ import UploadForm from "./components/UploadForm";
 import { cx } from "./components/shared";
 import type {
   HistoryItem,
+  PreviewBackgroundOption,
   ProgressStateKey,
   ProgressStepKey,
   ProgressStepState,
@@ -27,6 +28,8 @@ const HISTORY_KEY = "pixel-snapper-history";
 const ACTIVE_HISTORY_KEY = "pixel-snapper-active";
 const HISTORY_LIMIT = 12;
 const STATUS_TIMEOUT_MS = 4000;
+const PREVIEW_BACKGROUND_KEY = "pixel-snapper-preview-background";
+const PREVIEW_GRID_KEY = "pixel-snapper-preview-grid";
 
 const statusClasses: Record<StatusTone, string> = {
   info:
@@ -128,6 +131,29 @@ const generateRandomSeed = () => {
   return fallback();
 };
 
+const loadPreviewBackgroundPreference = (): PreviewBackgroundOption => {
+  if (typeof window === "undefined") {
+    return "light";
+  }
+  try {
+    const stored = localStorage.getItem(PREVIEW_BACKGROUND_KEY);
+    return stored === "dark" ? "dark" : "light";
+  } catch {
+    return "light";
+  }
+};
+
+const loadGridPreference = () => {
+  if (typeof window === "undefined") {
+    return false;
+  }
+  try {
+    return localStorage.getItem(PREVIEW_GRID_KEY) === "true";
+  } catch {
+    return false;
+  }
+};
+
 const blobToDataUrl = (blob: Blob) =>
   new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
@@ -219,6 +245,10 @@ const App = () => {
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [kColorsValue, setKColorsValue] = useState("16");
   const [kSeedValue, setKSeedValue] = useState("0");
+  const [previewBackground, setPreviewBackground] = useState<PreviewBackgroundOption>(
+    () => loadPreviewBackgroundPreference()
+  );
+  const [showPreviewGrid, setShowPreviewGrid] = useState(() => loadGridPreference());
 
   useEffect(() => {
     let items = loadHistory();
@@ -266,6 +296,28 @@ const App = () => {
       setActiveHistoryId(historyItems[0]?.id ?? null);
     }
   }, [activeHistoryId, historyItems]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    try {
+      localStorage.setItem(PREVIEW_BACKGROUND_KEY, previewBackground);
+    } catch {
+      // Ignore storage errors.
+    }
+  }, [previewBackground]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    try {
+      localStorage.setItem(PREVIEW_GRID_KEY, showPreviewGrid ? "true" : "false");
+    } catch {
+      // Ignore storage errors.
+    }
+  }, [showPreviewGrid]);
 
   useEffect(() => {
     return () => {
@@ -538,6 +590,14 @@ const App = () => {
     setActiveHistoryId((prev) => (prev === id ? null : prev));
   };
 
+  const togglePreviewBackground = () => {
+    setPreviewBackground((prev) => (prev === "light" ? "dark" : "light"));
+  };
+
+  const togglePreviewGrid = () => {
+    setShowPreviewGrid((prev) => !prev);
+  };
+
   const progressConfig = progressStates[progressState];
   const progressLabel = progressOverrides.label ?? progressConfig.label;
   const progressTone = progressOverrides.tone ?? progressConfig.tone;
@@ -588,17 +648,21 @@ const App = () => {
             onEditInput={handleEditInput}
           />
 
-          <ResultPanel
-            resultId={activeResult?.id ?? null}
-            resultUrl={activeResult?.dataUrl ?? null}
-            resultOriginalUrl={activeResult?.originalDataUrl ?? null}
-            resultDownloadName={activeResult?.downloadName ?? "snapped.png"}
-            resultDimensions={resultDimensions}
-            hasEdits={hasEdits}
-            onCommitEdits={handleCommitEdits}
-            onDiscardEdits={handleDiscardEdits}
-            onClearSelection={handleClearSelection}
-          />
+        <ResultPanel
+          resultId={activeResult?.id ?? null}
+          resultUrl={activeResult?.dataUrl ?? null}
+          resultOriginalUrl={activeResult?.originalDataUrl ?? null}
+          resultDownloadName={activeResult?.downloadName ?? "snapped.png"}
+          resultDimensions={resultDimensions}
+          hasEdits={hasEdits}
+          onCommitEdits={handleCommitEdits}
+          onDiscardEdits={handleDiscardEdits}
+          showGrid={showPreviewGrid}
+          previewBackground={previewBackground}
+          onToggleGrid={togglePreviewGrid}
+          onTogglePreviewBackground={togglePreviewBackground}
+          onClearSelection={handleClearSelection}
+        />
         </section>
 
         <HistorySection
@@ -607,6 +671,7 @@ const App = () => {
           onSelect={handleSelectHistory}
           onClearHistory={handleClearHistory}
           onDeleteItem={handleDeleteHistoryItem}
+          previewBackground={previewBackground}
         />
 
         <AppFooter />

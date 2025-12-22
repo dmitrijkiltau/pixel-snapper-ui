@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { HistoryItem } from "./types";
+import type { HistoryItem, PreviewBackgroundOption } from "./types";
 import { cx, SectionHeader, StepPill, TagPill } from "./shared";
 
 const formatTimestamp = (value: number) => {
@@ -15,9 +15,16 @@ type HistoryCardProps = {
   isActive: boolean;
   onSelect: (id: string) => void;
   onDelete: (item: HistoryItem) => void;
+  previewBackground: PreviewBackgroundOption;
 };
 
-const HistoryCard = ({ item, isActive, onSelect, onDelete }: HistoryCardProps) => {
+const HistoryCard = ({
+  item,
+  isActive,
+  onSelect,
+  onDelete,
+  previewBackground,
+}: HistoryCardProps) => {
   const timestamp = formatTimestamp(item.createdAt);
   const paletteLabel =
     typeof item.kColors === "number" && Number.isFinite(item.kColors)
@@ -34,6 +41,7 @@ const HistoryCard = ({ item, isActive, onSelect, onDelete }: HistoryCardProps) =
     typeof item.kSeed === "number" && Number.isFinite(item.kSeed)
       ? String(item.kSeed)
       : null;
+  const imageBackgroundClass = previewBackground === "dark" ? "bg-slate-900/60" : "bg-white/90";
 
   return (
     <details
@@ -47,7 +55,11 @@ const HistoryCard = ({ item, isActive, onSelect, onDelete }: HistoryCardProps) =
           src={item.dataUrl}
           alt={item.sourceName ? `Result from ${item.sourceName}` : "Result image"}
           loading="lazy"
-          className="pixelated h-36 w-full rounded-xl border border-slate-200 bg-[linear-gradient(135deg,rgba(15,23,42,0.04),rgba(148,163,184,0.08))] object-contain p-3 dark:border-slate-700 dark:bg-[linear-gradient(135deg,rgba(15,23,42,0.7),rgba(30,41,59,0.55))]"
+          className={cx(
+            "pixelated h-36 w-full rounded-xl border border-slate-200 object-contain p-3",
+            "dark:border-slate-700",
+            imageBackgroundClass
+          )}
         />
         <div className="flex flex-col gap-1 text-xs text-slate-500 dark:text-slate-300">
           <span className="font-semibold text-slate-700 dark:text-slate-100">
@@ -107,6 +119,7 @@ type HistorySectionProps = {
   onSelect: (id: string) => void;
   onClearHistory: () => void;
   onDeleteItem: (id: string) => void;
+  previewBackground: PreviewBackgroundOption;
 };
 
 const HistorySection = ({
@@ -115,6 +128,7 @@ const HistorySection = ({
   onSelect,
   onClearHistory,
   onDeleteItem,
+  previewBackground,
 }: HistorySectionProps) => {
   const clearDialogRef = useRef<HTMLDialogElement | null>(null);
   const deleteDialogRef = useRef<HTMLDialogElement | null>(null);
@@ -190,19 +204,20 @@ const HistorySection = ({
       </div>
 
       <div id="history" className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite">
-        {items.length === 0 ? (
-          <HistoryEmpty />
-        ) : (
-          items.map((item) => (
-            <HistoryCard
-              key={item.id}
-              item={item}
-              isActive={item.id === activeId}
-              onSelect={onSelect}
-              onDelete={openDeleteDialog}
-            />
-          ))
-        )}
+          {items.length === 0 ? (
+            <HistoryEmpty />
+          ) : (
+            items.map((item) => (
+              <HistoryCard
+                key={item.id}
+                item={item}
+                isActive={item.id === activeId}
+                onSelect={onSelect}
+                onDelete={openDeleteDialog}
+                previewBackground={previewBackground}
+              />
+            ))
+          )}
       </div>
 
       <dialog
