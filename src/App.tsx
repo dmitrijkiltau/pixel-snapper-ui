@@ -24,6 +24,7 @@ type ProgressOverrides = {
 };
 
 const HISTORY_KEY = "pixel-snapper-history";
+const ACTIVE_HISTORY_KEY = "pixel-snapper-active";
 const HISTORY_LIMIT = 12;
 
 const statusClasses: Record<StatusTone, string> = {
@@ -139,7 +140,13 @@ const loadHistory = (): HistoryItem[] => {
     if (!Array.isArray(parsed)) {
       return [];
     }
-    return parsed.filter((item) => item && typeof item.dataUrl === "string");
+    return parsed
+      .filter((item) => item && typeof item.dataUrl === "string")
+      .map((item) => ({
+        ...item,
+        originalDataUrl:
+          typeof item.originalDataUrl === "string" ? item.originalDataUrl : item.dataUrl,
+      }));
   } catch {
     return [];
   }
@@ -147,9 +154,24 @@ const loadHistory = (): HistoryItem[] => {
 
 const saveHistory = (items: HistoryItem[]) => {
   try {
-    localStorage.setItem(HISTORY_KEY, JSON.stringify(items));
+    const sanitized = items.map((item) => {
+      if (item.originalDataUrl && item.originalDataUrl === item.dataUrl) {
+        const { originalDataUrl: _originalDataUrl, ...rest } = item;
+        return rest;
+      }
+      return item;
+    });
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(sanitized));
   } catch {
     // Ignore storage errors.
+  }
+};
+
+const loadActiveHistoryId = () => {
+  try {
+    return localStorage.getItem(ACTIVE_HISTORY_KEY);
+  } catch {
+    return null;
   }
 };
 
@@ -162,11 +184,7 @@ const App = () => {
   const [uploadPreviewUrl, setUploadPreviewUrl] = useState<string | null>(null);
   const [uploadFileName, setUploadFileName] = useState("No file selected");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [resultUrl, setResultUrl] = useState<string | null>(null);
-  const [resultDownloadName, setResultDownloadName] = useState("snapped.png");
-  const [resultDimensions, setResultDimensions] = useState<{ width: number; height: number } | null>(
-    null
-  );
+  const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [kColorsValue, setKColorsValue] = useState("16");
   const [kSeedValue, setKSeedValue] = useState("42");
@@ -178,11 +196,44 @@ const App = () => {
       saveHistory(items);
     }
     setHistoryItems(items);
+    const storedActiveId = loadActiveHistoryId();
+    const nextActiveId =
+      storedActiveId && items.some((item) => item.id === storedActiveId)
+        ? storedActiveId
+        : items[0]?.id ?? null;
+    setActiveHistoryId(nextActiveId);
   }, []);
 
   useEffect(() => {
     saveHistory(historyItems);
   }, [historyItems]);
+
+  useEffect(() => {
+    try {
+      if (activeHistoryId) {
+        localStorage.setItem(ACTIVE_HISTORY_KEY, activeHistoryId);
+      } else {
+        localStorage.removeItem(ACTIVE_HISTORY_KEY);
+      }
+    } catch {
+      // Ignore storage errors.
+    }
+  }, [activeHistoryId]);
+
+  useEffect(() => {
+    if (!historyItems.length) {
+      if (activeHistoryId) {
+        setActiveHistoryId(null);
+      }
+      return;
+    }
+    const exists = activeHistoryId
+      ? historyItems.some((item) => item.id === activeHistoryId)
+      : false;
+    if (!exists) {
+      setActiveHistoryId(historyItems[0]?.id ?? null);
+    }
+  }, [activeHistoryId, historyItems]);
 
   useEffect(() => {
     return () => {
@@ -191,14 +242,6 @@ const App = () => {
       }
     };
   }, [uploadPreviewUrl]);
-
-  useEffect(() => {
-    return () => {
-      if (resultUrl) {
-        URL.revokeObjectURL(resultUrl);
-      }
-    };
-  }, [resultUrl]);
 
   const updateProgress = (state: ProgressStateKey, overrides: ProgressOverrides = {}) => {
     setProgressState(state);
@@ -235,29 +278,9 @@ const App = () => {
     }
   };
 
-  const addHistoryItem = async (
-    blob: Blob,
-    sourceName: string,
-    downloadName: string,
-    meta: { width?: number; height?: number; kColors: number; kSeed: number }
-  ) => {
-    try {
-      const dataUrl = await blobToDataUrl(blob);
-      const entry: HistoryItem = {
-        id: createId(),
-        dataUrl,
-        sourceName: sourceName || "",
-        downloadName: downloadName || "snapped.png",
-        createdAt: Date.now(),
-        width: meta.width,
-        height: meta.height,
-        kColors: meta.kColors,
-        kSeed: meta.kSeed,
-      };
-      setHistoryItems((prev) => [entry, ...prev].slice(0, HISTORY_LIMIT));
-    } catch {
-      // Ignore history write errors.
-    }
+  const pushHistoryItem = (entry: HistoryItem) => {
+    setHistoryItems((prev) => [entry, ...prev].slice(0, HISTORY_LIMIT));
+    setActiveHistoryId(entry.id);
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -310,22 +333,26 @@ const App = () => {
       }
 
       const downloadName = toSafeDownloadName(selectedFile.name);
-      const nextUrl = URL.createObjectURL(blob);
-      setResultUrl(nextUrl);
-      setResultDownloadName(downloadName);
       let dimensions: { width: number; height: number } | null = null;
       try {
         dimensions = await getImageDimensions(blob);
       } catch {
         dimensions = null;
       }
-      setResultDimensions(dimensions);
-      void addHistoryItem(blob, selectedFile.name, downloadName, {
+      const dataUrl = await blobToDataUrl(blob);
+      const entry: HistoryItem = {
+        id: createId(),
+        dataUrl,
+        originalDataUrl: dataUrl,
+        sourceName: selectedFile.name || "",
+        downloadName,
+        createdAt: Date.now(),
         width: dimensions?.width,
         height: dimensions?.height,
         kColors: parsedColors,
         kSeed: parsedSeed,
-      });
+      };
+      pushHistoryItem(entry);
       setStatus("Snapped. Your download is ready.", "success");
       updateProgress("complete");
     } catch (error) {
@@ -342,6 +369,54 @@ const App = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const activeResult = useMemo(() => {
+    if (!activeHistoryId) {
+      return null;
+    }
+    return historyItems.find((item) => item.id === activeHistoryId) ?? null;
+  }, [activeHistoryId, historyItems]);
+
+  const resultDimensions =
+    activeResult &&
+    typeof activeResult.width === "number" &&
+    typeof activeResult.height === "number"
+      ? { width: activeResult.width, height: activeResult.height }
+      : null;
+
+  const hasEdits =
+    Boolean(activeResult?.originalDataUrl) &&
+    activeResult?.dataUrl !== activeResult?.originalDataUrl;
+
+  const handleCommitEdits = (dataUrl: string) => {
+    if (!activeHistoryId) {
+      return;
+    }
+    setHistoryItems((prev) =>
+      prev.map((item) =>
+        item.id === activeHistoryId
+          ? {
+              ...item,
+              dataUrl,
+              originalDataUrl: item.originalDataUrl ?? item.dataUrl,
+            }
+          : item
+      )
+    );
+  };
+
+  const handleDiscardEdits = () => {
+    if (!activeHistoryId) {
+      return;
+    }
+    setHistoryItems((prev) =>
+      prev.map((item) =>
+        item.id === activeHistoryId
+          ? { ...item, dataUrl: item.originalDataUrl ?? item.dataUrl }
+          : item
+      )
+    );
   };
 
   const progressConfig = progressStates[progressState];
@@ -444,9 +519,13 @@ const App = () => {
           />
 
           <ResultPanel
-            resultUrl={resultUrl}
-            resultDownloadName={resultDownloadName}
+            resultId={activeResult?.id ?? null}
+            resultUrl={activeResult?.dataUrl ?? null}
+            resultDownloadName={activeResult?.downloadName ?? "snapped.png"}
             resultDimensions={resultDimensions}
+            hasEdits={hasEdits}
+            onCommitEdits={handleCommitEdits}
+            onDiscardEdits={handleDiscardEdits}
           />
         </section>
 

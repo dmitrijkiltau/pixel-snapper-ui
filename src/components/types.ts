@@ -6,6 +6,7 @@ export type ProgressStateKey = "idle" | "ready" | "processing" | "complete" | "e
 export type HistoryItem = {
   id: string;
   dataUrl: string;
+  originalDataUrl?: string;
   sourceName: string;
   downloadName: string;
   createdAt: number;
