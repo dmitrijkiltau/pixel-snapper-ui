@@ -63,6 +63,9 @@
   }
 
   .dialog-shell {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     width: min(90vw, 440px);
     border: 1px solid rgb(var(--card-border) / 0.8);
     background-color: rgb(var(--card-bg) / 0.95);
