@@ -489,7 +489,7 @@ const decodeImageData = async (input: Blob): Promise<ImageData> => {
   if (typeof createImageBitmap === "function") {
     const bitmap = await createImageBitmap(input);
     const canvas = ensureCanvas(bitmap.width, bitmap.height);
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) {
       bitmap.close?.();
       throw new Error("Canvas 2D context is not available.");
@@ -515,7 +515,7 @@ const decodeImageData = async (input: Blob): Promise<ImageData> => {
     });
 
     const canvas = ensureCanvas(image.naturalWidth, image.naturalHeight);
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) {
       throw new Error("Canvas 2D context is not available.");
     }
