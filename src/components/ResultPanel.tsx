@@ -343,6 +343,9 @@ const ResultPanel = ({
   }
 
   function refreshPaletteFromCanvas() {
+    if (isEditing) {
+      return;
+    }
     const canvas = canvasRef.current;
     if (!canvas) {
       return;
@@ -703,6 +706,12 @@ const ResultPanel = ({
     viewport.addEventListener("wheel", handleWheel, { passive: false });
     return () => viewport.removeEventListener("wheel", handleWheel);
   }, [hasResult, pan.x, pan.y, zoom]);
+
+  useEffect(() => {
+    if (!isEditing && hasResult) {
+      refreshPaletteFromCanvas();
+    }
+  }, [hasResult, isEditing]);
 
   const handleToggleEdit = () => {
     if (!hasResult) {
