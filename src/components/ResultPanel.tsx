@@ -158,6 +158,8 @@ const ResultPanel = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editTool, setEditTool] = useState<"paint" | "erase" | "fill">("paint");
   const [brushColor, setBrushColor] = useState("#0f172a");
+  const [showGrid, setShowGrid] = useState(false);
+  const [previewBackground, setPreviewBackground] = useState<"light" | "dark">("light");
   const [palette, setPalette] = useState<string[]>(
     Array.from({ length: PALETTE_SIZE }, () => "#0f172a")
   );
@@ -189,6 +191,8 @@ const ResultPanel = ({
     setIsPainting(false);
     setHasPendingEdits(false);
     setPalette(Array.from({ length: PALETTE_SIZE }, () => "#0f172a"));
+    setShowGrid(false);
+    setPreviewBackground("light");
     setShowHelp(false);
     setShowMoreMenu(false);
     dragState.current = null;
@@ -316,6 +320,8 @@ const ResultPanel = ({
       : null;
   const hasResult = Boolean(resultUrl);
   const canRestore = hasEdits && Boolean(resultOriginalUrl);
+  const previewBackgroundColor =
+    previewBackground === "dark" ? "rgba(15, 23, 42, 0.9)" : "rgba(255, 255, 255, 0.85)";
 
   function extractPaletteFromCanvas(canvas: HTMLCanvasElement) {
     const ctx = getCanvasContext(canvas);
@@ -970,20 +976,76 @@ const ResultPanel = ({
               <div
                 ref={viewportRef}
                 className={cx(
-                  "preview-viewport relative w-full rounded-2xl border border-slate-200/70 bg-white/70 p-4 sm:p-6 dark:border-slate-700/70 dark:bg-slate-900/60",
+                  "preview-viewport group relative w-full rounded-2xl border border-slate-200/70 bg-white/70 p-4 sm:p-6 dark:border-slate-700/70 dark:bg-slate-900/60",
                   cursorClassName,
                   isPainting && "cursor-crosshair"
                 )}
+                style={{ backgroundColor: previewBackgroundColor }}
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
                 onPointerCancel={handlePointerUp}
                 onContextMenu={(event) => event.preventDefault()}
               >
+                <div className="pointer-events-none absolute right-3 top-3 z-10 flex items-center gap-2 opacity-0 transition group-hover:opacity-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowGrid((prev) => !prev)}
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onPointerUp={(event) => event.stopPropagation()}
+                    className={cx(
+                      "pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-full border text-slate-500 shadow-sm transition hover:text-slate-700",
+                      showGrid
+                        ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
+                        : "border-slate-200 bg-white/80 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300"
+                    )}
+                    aria-pressed={showGrid}
+                    aria-label="Toggle grid"
+                  >
+                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M4 9h16M4 15h16M9 4v16M15 4v16" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPreviewBackground((prev) => (prev === "light" ? "dark" : "light"))
+                    }
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onPointerUp={(event) => event.stopPropagation()}
+                    className="pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-500 shadow-sm transition hover:text-slate-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:text-slate-100"
+                    aria-label="Toggle preview background"
+                  >
+                    {previewBackground === "light" ? (
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <path
+                          d="M14.5 4.5A7.5 7.5 0 0 0 19.5 15a7.5 7.5 0 1 1-5-10.5Z"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    ) : (
+                      <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <circle cx="12" cy="12" r="4" />
+                        <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" strokeLinecap="round" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
                 <div
-                  className="preview-canvas"
+                  className="preview-canvas relative"
                   style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
                 >
+                  <div
+                    className={cx(
+                      "pixel-grid pointer-events-none absolute left-0 top-0",
+                      showGrid ? "opacity-100" : "opacity-0"
+                    )}
+                    style={{
+                      width: imageSize?.width ?? 0,
+                      height: imageSize?.height ?? 0,
+                    }}
+                  />
                   <canvas ref={canvasRef} className="preview-image pixelated" />
                 </div>
               </div>
