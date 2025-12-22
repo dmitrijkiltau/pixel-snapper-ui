@@ -655,7 +655,7 @@ const App = () => {
           aria-label="Dismiss status message"
           onClick={() => setStatusMessage("")}
         >
-          ×
+          X
         </button>
         <span
           aria-hidden="true"

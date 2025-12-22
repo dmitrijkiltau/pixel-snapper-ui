@@ -344,7 +344,10 @@ const ResultPanel = ({
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!hasResult || (event.button !== 0 && event.button !== 2)) {
+    if (!hasResult) {
+      return;
+    }
+    if (event.pointerType === "mouse" && event.button !== 0 && event.button !== 2) {
       return;
     }
 
