@@ -3,7 +3,7 @@ import type { PointerEvent as ReactPointerEvent } from "react";
 import { cx, SectionHeader, StepPill } from "./shared";
 
 const MIN_ZOOM = 0.5;
-const MAX_ZOOM = 6;
+const MAX_ZOOM = 8;
 const PALETTE_SIZE = 10;
 
 const IconUndo = () => (
