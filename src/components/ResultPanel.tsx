@@ -679,7 +679,7 @@ const ResultPanel = ({
     } catch {
       // ignore copy failures, still show feedback
     } finally {
-      showPaletteFeedback(color, "copied");
+      showPaletteFeedback(color, "copied hex");
     }
   };
 
@@ -1239,7 +1239,7 @@ const ResultPanel = ({
                             key={`${segment.color}-${index}`}
                             type="button"
                             onClick={() => handlePaletteSegmentAction(segment.color)}
-                            className="group relative h-full border-0 p-0 text-transparent transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500"
+                            className="group relative h-full border-0 p-0 text-transparent transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500 first:rounded-l-2xl"
                             style={{
                               width: `${segment.usageWidth}%`,
                               backgroundColor: segment.color,
