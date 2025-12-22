@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent } from "react";
 import { cx, SectionHeader, StepPill } from "./shared";
 
@@ -32,6 +32,43 @@ type PaintState = {
   lastY: number;
 };
 
+type EditHistoryState = {
+  entries: string[];
+  index: number;
+};
+
+type EditHistoryAction =
+  | { type: "reset"; dataUrl: string | null }
+  | { type: "push"; dataUrl: string }
+  | { type: "undo" }
+  | { type: "redo" };
+
+const editHistoryReducer = (state: EditHistoryState, action: EditHistoryAction) => {
+  switch (action.type) {
+    case "reset":
+      return action.dataUrl
+        ? { entries: [action.dataUrl], index: 0 }
+        : { entries: [], index: -1 };
+    case "push": {
+      const current = state.entries[state.index];
+      if (current === action.dataUrl) {
+        return state;
+      }
+      const nextEntries = state.entries.slice(0, state.index + 1);
+      nextEntries.push(action.dataUrl);
+      return { entries: nextEntries, index: nextEntries.length - 1 };
+    }
+    case "undo":
+      return state.index > 0 ? { ...state, index: state.index - 1 } : state;
+    case "redo":
+      return state.index < state.entries.length - 1
+        ? { ...state, index: state.index + 1 }
+        : state;
+    default:
+      return state;
+  }
+};
+
 const ResultPanel = ({
   resultId,
   resultUrl,
@@ -52,6 +89,10 @@ const ResultPanel = ({
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(
     null
   );
+  const [editHistory, dispatchEditHistory] = useReducer(editHistoryReducer, {
+    entries: [],
+    index: -1,
+  });
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const dragState = useRef<DragState | null>(null);
@@ -71,44 +112,63 @@ const ResultPanel = ({
     lastLoadedUrlRef.current = null;
     shouldCenterRef.current = true;
     setImageSize(null);
+    dispatchEditHistory({ type: "reset", dataUrl: null });
   }, [resultId]);
 
   const resultWidth = resultDimensions?.width ?? null;
   const resultHeight = resultDimensions?.height ?? null;
+  const canUndo = editHistory.index > 0;
+  const canRedo =
+    editHistory.index >= 0 && editHistory.index < editHistory.entries.length - 1;
+
+  const drawImageToCanvas = (image: HTMLImageElement, url: string) => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
+    const width = resultWidth ?? image.naturalWidth;
+    const height = resultHeight ?? image.naturalHeight;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      return;
+    }
+    ctx.imageSmoothingEnabled = false;
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0, width, height);
+    lastLoadedUrlRef.current = url;
+    setImageSize({ width, height });
+  };
+
+  const loadImageFromUrl = (url: string, options?: { resetHistory?: boolean }) => {
+    const image = new Image();
+    image.decoding = "async";
+    image.onload = () => {
+      drawImageToCanvas(image, url);
+      if (options?.resetHistory) {
+        dispatchEditHistory({ type: "reset", dataUrl: url });
+      }
+    };
+    image.onerror = () => {
+      setImageSize(null);
+      if (options?.resetHistory) {
+        dispatchEditHistory({ type: "reset", dataUrl: null });
+      }
+    };
+    image.src = url;
+  };
 
   useEffect(() => {
     if (!resultUrl) {
       setImageSize(null);
+      dispatchEditHistory({ type: "reset", dataUrl: null });
       return;
     }
     if (resultUrl === lastLoadedUrlRef.current) {
       return;
     }
-    const image = new Image();
-    image.decoding = "async";
-    image.onload = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) {
-        return;
-      }
-      const width = resultWidth ?? image.naturalWidth;
-      const height = resultHeight ?? image.naturalHeight;
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        return;
-      }
-      ctx.imageSmoothingEnabled = false;
-      ctx.clearRect(0, 0, width, height);
-      ctx.drawImage(image, 0, 0, width, height);
-      lastLoadedUrlRef.current = resultUrl;
-      setImageSize({ width, height });
-    };
-    image.onerror = () => {
-      setImageSize(null);
-    };
-    image.src = resultUrl;
+    loadImageFromUrl(resultUrl, { resetHistory: true });
   }, [resultHeight, resultUrl, resultWidth]);
 
   const getViewportMetrics = () => {
@@ -237,7 +297,44 @@ const ResultPanel = ({
     const dataUrl = canvas.toDataURL("image/png");
     lastLoadedUrlRef.current = dataUrl;
     onCommitEdits(dataUrl);
+    dispatchEditHistory({ type: "push", dataUrl });
     setHasPendingEdits(false);
+  };
+
+  const applyHistoryEntry = (dataUrl: string) => {
+    if (!dataUrl) {
+      return;
+    }
+    lastLoadedUrlRef.current = dataUrl;
+    setHasPendingEdits(false);
+    loadImageFromUrl(dataUrl);
+    onCommitEdits(dataUrl);
+  };
+
+  const handleUndo = () => {
+    if (!canUndo) {
+      return;
+    }
+    const nextIndex = editHistory.index - 1;
+    const nextUrl = editHistory.entries[nextIndex];
+    if (!nextUrl) {
+      return;
+    }
+    dispatchEditHistory({ type: "undo" });
+    applyHistoryEntry(nextUrl);
+  };
+
+  const handleRedo = () => {
+    if (!canRedo) {
+      return;
+    }
+    const nextIndex = editHistory.index + 1;
+    const nextUrl = editHistory.entries[nextIndex];
+    if (!nextUrl) {
+      return;
+    }
+    dispatchEditHistory({ type: "redo" });
+    applyHistoryEntry(nextUrl);
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -381,6 +478,8 @@ const ResultPanel = ({
     }
     if (isEditing) {
       commitEdits();
+    } else if (!editHistory.entries.length && resultUrl) {
+      dispatchEditHistory({ type: "reset", dataUrl: resultUrl });
     }
     setIsEditing((prev) => !prev);
   };
@@ -485,6 +584,22 @@ const ResultPanel = ({
                   aria-label="Brush color"
                 />
               </label>
+              <button
+                type="button"
+                onClick={handleUndo}
+                disabled={!canUndo || isPainting}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.25em] text-slate-600 transition hover:border-slate-400 hover:text-slate-900 disabled:cursor-not-allowed disabled:border-slate-200/70 disabled:bg-white/50 disabled:text-slate-400 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-slate-100 dark:disabled:border-slate-700/70 dark:disabled:bg-slate-900/50 dark:disabled:text-slate-500"
+              >
+                Undo
+              </button>
+              <button
+                type="button"
+                onClick={handleRedo}
+                disabled={!canRedo || isPainting}
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.25em] text-slate-600 transition hover:border-slate-400 hover:text-slate-900 disabled:cursor-not-allowed disabled:border-slate-200/70 disabled:bg-white/50 disabled:text-slate-400 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-slate-100 dark:disabled:border-slate-700/70 dark:disabled:bg-slate-900/50 dark:disabled:text-slate-500"
+              >
+                Redo
+              </button>
               <span className="tag-pill">Alt to sample</span>
             </>
           ) : null}
