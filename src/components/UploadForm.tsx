@@ -9,8 +9,6 @@ type UploadFormProps = {
   uploadPreviewAlt: string;
   kColorsValue: string;
   kSeedValue: string;
-  statusClassName: string;
-  statusMessage: string;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onFileChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onKColorsChange: (value: string) => void;
@@ -26,8 +24,6 @@ const UploadForm = ({
   uploadPreviewAlt,
   kColorsValue,
   kSeedValue,
-  statusClassName,
-  statusMessage,
   onSubmit,
   onFileChange,
   onKColorsChange,
@@ -117,9 +113,6 @@ const UploadForm = ({
       </button>
     </div>
 
-    <div id="status" className={statusClassName} aria-live="polite">
-      {statusMessage}
-    </div>
   </form>
 );
 

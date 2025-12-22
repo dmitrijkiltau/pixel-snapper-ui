@@ -26,6 +26,7 @@ type ProgressOverrides = {
 const HISTORY_KEY = "pixel-snapper-history";
 const ACTIVE_HISTORY_KEY = "pixel-snapper-active";
 const HISTORY_LIMIT = 12;
+const STATUS_TIMEOUT_MS = 4000;
 
 const statusClasses: Record<StatusTone, string> = {
   info:
@@ -256,6 +257,16 @@ const App = () => {
       }
     };
   }, [uploadPreviewUrl]);
+
+  useEffect(() => {
+    if (!statusMessage) {
+      return;
+    }
+    const timeoutId = window.setTimeout(() => {
+      setStatusMessage("");
+    }, STATUS_TIMEOUT_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [statusMessage]);
 
   const updateProgress = (state: ProgressStateKey, overrides: ProgressOverrides = {}) => {
     setProgressState(state);
@@ -570,7 +581,7 @@ const App = () => {
   ]);
 
   const statusClassName = cx(
-    "rounded-2xl border px-4 py-3 text-sm font-semibold",
+    "fixed bottom-6 left-1/2 z-30 w-[min(92vw,420px)] -translate-x-1/2 rounded-2xl border px-4 py-3 pr-10 text-sm font-semibold shadow-lg backdrop-blur",
     !statusMessage && "hidden",
     statusClasses[statusTone]
   );
@@ -605,8 +616,6 @@ const App = () => {
             uploadPreviewAlt={uploadPreviewAlt}
             kColorsValue={kColorsValue}
             kSeedValue={kSeedValue}
-            statusClassName={statusClassName}
-            statusMessage={statusMessage}
             onSubmit={handleSubmit}
             onFileChange={handleFileChange}
             onKColorsChange={setKColorsValue}
@@ -637,6 +646,23 @@ const App = () => {
 
         <AppFooter />
       </main>
+
+      <div id="status" className={statusClassName} aria-live="polite">
+        <span>{statusMessage}</span>
+        <button
+          type="button"
+          className="absolute right-3 top-3 text-lg leading-none text-slate-500 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+          aria-label="Dismiss status message"
+          onClick={() => setStatusMessage("")}
+        >
+          ×
+        </button>
+        <span
+          aria-hidden="true"
+          className="toast-timer"
+          style={{ animationDuration: `${STATUS_TIMEOUT_MS}ms` }}
+        />
+      </div>
     </div>
   );
 };
