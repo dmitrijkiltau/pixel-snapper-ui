@@ -42,7 +42,7 @@ const HeroHeader = () => (
             key={step.title}
             className="flex gap-3 rounded-2xl border border-slate-200/80 bg-white/75 p-3 shadow-sm dark:border-slate-700/70 dark:bg-slate-900/70"
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-900 text-xs font-semibold text-white dark:bg-slate-100 dark:text-slate-900">
+            <div className="flex h-9 w-9 aspect-square items-center justify-center rounded-xl bg-slate-900 text-xs font-semibold text-white dark:bg-slate-100 dark:text-slate-900">
               {String(index + 1).padStart(2, "0")}
             </div>
             <div className="flex flex-col gap-1">
