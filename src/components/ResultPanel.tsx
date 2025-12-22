@@ -396,6 +396,19 @@ const ResultPanel = ({
   const canRestore = hasEdits && Boolean(resultOriginalUrl);
   const previewBackgroundColor =
     previewBackground === "dark" ? "rgba(15, 23, 42, 0.9)" : "rgba(255, 255, 255, 0.85)";
+  const paletteSegments = palette.map((entry) => {
+    const usageWidth = clamp(entry.percentage, 0, 100);
+    return {
+      color: entry.color,
+      percentage: entry.percentage,
+      usageWidth,
+    };
+  });
+  const paletteTotalUsage = paletteSegments.reduce(
+    (acc, entry) => acc + entry.usageWidth,
+    0
+  );
+  const paletteOthersWidth = clamp(100 - paletteTotalUsage, 0, 100);
 
   function extractPaletteFromCanvas(canvas: HTMLCanvasElement): PaletteEntry[] {
     const ctx = getCanvasContext(canvas);
@@ -1196,57 +1209,75 @@ const ResultPanel = ({
                   <canvas ref={canvasRef} className="preview-image pixelated" />
                 </div>
               </div>
-              <div className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200/70 bg-white/70 px-3 py-2 text-[0.6rem] text-slate-500 dark:border-slate-700/70 dark:bg-slate-900/60 dark:text-slate-300">
+              <div className="w-full flex flex-col gap-3 rounded-xl border border-slate-200/70 bg-white/70 px-3 py-2 text-[0.6rem] text-slate-500 dark:border-slate-700/70 dark:bg-slate-900/60 dark:text-slate-300">
                 <span className="text-[0.55rem] font-semibold uppercase tracking-[0.35em] text-slate-400 dark:text-slate-500">
                   Palette
                 </span>
-                <div className="flex flex-wrap items-center gap-2">
-                  {palette.map((entry, index) => {
-                    const { color, percentage } = entry;
-                    const isCopied = copiedColor === color;
-                    const displayColor = isCopied ? "copied" : color.toUpperCase();
-                    if (!isEditing) {
+                {!isEditing ? (
+                  <div className="flex flex-col gap-2 px-1 pb-1">
+                    <div className="relative flex h-12 overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100/80 shadow-inner dark:border-slate-700/80 dark:bg-slate-950">
+                      <div className="flex h-full w-full">
+                        {paletteSegments.map((segment, index) => {
+                          if (segment.usageWidth <= 0) {
+                            return null;
+                          }
+                          const isCopied = copiedColor === segment.color;
+                          const usageLabel = formatPercentage(segment.percentage);
+                          const tooltipLabel = isCopied
+                            ? `${usageLabel} • Copied`
+                            : usageLabel;
+                          return (
+                            <button
+                              key={`${segment.color}-${index}`}
+                              type="button"
+                              onClick={() => copyPaletteColor(segment.color)}
+                              className="group relative h-full border-0 p-0 text-transparent transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500"
+                              style={{
+                                width: `${segment.usageWidth}%`,
+                                backgroundColor: segment.color,
+                              }}
+                              title={tooltipLabel}
+                              aria-label={`Copy palette color ${segment.color}`}
+                            >
+                              <span className="pointer-events-none absolute left-1/2 -top-6 -translate-x-1/2 whitespace-nowrap rounded-full border border-slate-900/10 bg-slate-900/80 px-2 py-0.5 text-[0.55rem] font-semibold text-white opacity-0 transition group-hover:opacity-100 dark:border-slate-100/20 dark:bg-slate-50/90 dark:text-slate-900">
+                                {tooltipLabel}
+                              </span>
+                            </button>
+                          );
+                        })}
+                        {paletteOthersWidth > 0 && (
+                          <div
+                            aria-hidden="true"
+                            className="pointer-events-none h-full bg-gradient-to-r from-white/60 to-white/0 dark:from-slate-900/80 dark:to-slate-900/20"
+                            style={{ width: `${paletteOthersWidth}%` }}
+                          />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {palette.map((entry, index) => {
+                      const { color } = entry;
                       return (
                         <button
                           key={`${color}-${index}`}
                           type="button"
-                          onClick={() => copyPaletteColor(color)}
-                          className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100"
-                          aria-label={`Copy palette color ${color}`}
-                          title="Copy HEX color to clipboard"
-                        >
-                          <span
-                            className="h-4 w-4 rounded-full border border-slate-200 dark:border-slate-700"
-                            style={{ backgroundColor: color }}
-                          />
-                          <span className="flex items-center gap-1">
-                            <span className="hex-mono">{displayColor}</span>
-                            <span className="percentage-pill hex-mono rounded-full border border-slate-200/80 bg-slate-100 px-2 py-0.5 text-[0.6rem] font-semibold text-slate-600 uppercase dark:border-slate-700/80 dark:bg-slate-800/60 dark:text-slate-200">
-                              {formatPercentage(percentage)}
-                            </span>
-                          </span>
-                        </button>
+                          onClick={() => setBrushColor(color)}
+                          className={cx(
+                            "h-7 w-7 rounded-md border transition",
+                            brushColor.toLowerCase() === color.toLowerCase()
+                              ? "border-slate-900 ring-2 ring-slate-900/20 dark:border-slate-100 dark:ring-slate-100/20"
+                              : "border-slate-300 hover:border-slate-400 dark:border-slate-600 dark:hover:border-slate-400"
+                          )}
+                          style={{ backgroundColor: color }}
+                          aria-label={`Select palette color ${index + 1}`}
+                          title={`Select ${color}`}
+                        />
                       );
-                    }
-
-                    return (
-                      <button
-                        key={`${color}-${index}`}
-                        type="button"
-                        onClick={() => setBrushColor(color)}
-                        className={cx(
-                          "h-7 w-7 rounded-md border transition",
-                          brushColor.toLowerCase() === color.toLowerCase()
-                            ? "border-slate-900 ring-2 ring-slate-900/20 dark:border-slate-100 dark:ring-slate-100/20"
-                            : "border-slate-300 hover:border-slate-400 dark:border-slate-600 dark:hover:border-slate-400"
-                        )}
-                        style={{ backgroundColor: color }}
-                        aria-label={`Select palette color ${index + 1}`}
-                        title={`Select ${color}`}
-                      />
-                    );
-                  })}
-                </div>
+                    })}
+                  </div>
+                )}
               </div>
               <a
                 href={resultUrl}
