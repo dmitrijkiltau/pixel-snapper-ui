@@ -13,7 +13,6 @@ import type {
   ProgressStepKey,
   ProgressStepState,
   ProgressTone,
-  PreviewScale,
   StatusTone,
 } from "./components/types";
 import { processImageBlob } from "./pixelSnapper";
@@ -160,7 +159,6 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [progressState, setProgressState] = useState<ProgressStateKey>("idle");
   const [progressOverrides, setProgressOverrides] = useState<ProgressOverrides>({});
-  const [previewScale, setPreviewScale] = useState<PreviewScale>("1");
   const [uploadPreviewUrl, setUploadPreviewUrl] = useState<string | null>(null);
   const [uploadFileName, setUploadFileName] = useState("No file selected");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -449,8 +447,6 @@ const App = () => {
             resultUrl={resultUrl}
             resultDownloadName={resultDownloadName}
             resultDimensions={resultDimensions}
-            previewScale={previewScale}
-            onPreviewScaleChange={setPreviewScale}
           />
         </section>
 
