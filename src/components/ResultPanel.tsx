@@ -1024,7 +1024,7 @@ const ResultPanel = ({
                 <IconMoreVertical />
               </button>
               {showMoreMenu ? (
-                <div className="absolute right-0 top-full z-10 mt-1 min-w-40 rounded-xl border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+                <div className="absolute right-0 top-full z-20 mt-1 min-w-40 rounded-xl border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
                   {hasEdits ? (
                     <button
                       type="button"
