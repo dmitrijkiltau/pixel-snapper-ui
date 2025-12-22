@@ -487,9 +487,30 @@ const App = () => {
     );
   };
 
+  const handleRemoveResult = () => {
+    if (!activeHistoryId) {
+      return;
+    }
+    setHistoryItems((prev) => prev.filter((item) => item.id !== activeHistoryId));
+    setActiveHistoryId(null);
+    setStatus("Result removed.", "info");
+  };
+
   const handleSelectHistory = (id: string) => {
     setActiveHistoryId(id);
     setStatus("History entry loaded into the editor.", "info");
+  };
+
+  const handleClearHistory = () => {
+    setHistoryItems([]);
+    setActiveHistoryId(null);
+    setStatus("History cleared.", "info");
+  };
+
+  const handleDeleteHistoryItem = (id: string) => {
+    setHistoryItems((prev) => prev.filter((item) => item.id !== id));
+    setStatus("History entry deleted.", "info");
+    setActiveHistoryId((prev) => (prev === id ? null : prev));
   };
 
   const progressConfig = progressStates[progressState];
@@ -602,6 +623,7 @@ const App = () => {
             hasEdits={hasEdits}
             onCommitEdits={handleCommitEdits}
             onDiscardEdits={handleDiscardEdits}
+            onRemoveResult={handleRemoveResult}
           />
         </section>
 
@@ -609,6 +631,8 @@ const App = () => {
           items={historyItems}
           activeId={activeHistoryId}
           onSelect={handleSelectHistory}
+          onClearHistory={handleClearHistory}
+          onDeleteItem={handleDeleteHistoryItem}
         />
 
         <AppFooter />

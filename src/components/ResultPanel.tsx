@@ -17,6 +17,7 @@ type ResultPanelProps = {
   hasEdits: boolean;
   onCommitEdits: (dataUrl: string) => void;
   onDiscardEdits: () => void;
+  onRemoveResult: () => void;
 };
 
 type DragState = {
@@ -79,6 +80,7 @@ const ResultPanel = ({
   hasEdits,
   onCommitEdits,
   onDiscardEdits,
+  onRemoveResult,
 }: ResultPanelProps) => {
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -638,6 +640,13 @@ const ResultPanel = ({
               Restore original
             </button>
           ) : null}
+          <button
+            type="button"
+            onClick={onRemoveResult}
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-slate-600 transition hover:border-slate-400 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-slate-100"
+          >
+            Remove result
+          </button>
         </div>
       ) : null}
 
