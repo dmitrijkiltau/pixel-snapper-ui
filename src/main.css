@@ -103,7 +103,8 @@
     @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_-16px_rgba(15,23,42,0.9)] transition hover:-translate-y-0.5 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white dark:shadow-[0_12px_30px_-16px_rgba(8,15,30,0.9)] dark:focus-visible:ring-slate-200/70;
   }
 
-  [class^="btn-"]:not(:disabled) {
+  [class^="btn-"]:not(:disabled),
+  [type="button"]:not(:disabled) {
     @apply cursor-pointer;
   },
 
