@@ -4,6 +4,7 @@ import { cx, SectionHeader, StepPill } from "./shared";
 
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 6;
+const PALETTE_SIZE = 10;
 
 const IconUndo = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5">
@@ -48,6 +49,16 @@ const IconErase = () => (
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
+
+const toHex = (value: number) => value.toString(16).padStart(2, "0");
+
+const normalizePalette = (colors: string[], size: number, fallback: string) => {
+  const next = colors.slice(0, size);
+  while (next.length < size) {
+    next.push(fallback);
+  }
+  return next;
+};
 
 type ResultPanelProps = {
   resultId: string | null;
@@ -129,6 +140,9 @@ const ResultPanel = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editTool, setEditTool] = useState<"paint" | "erase">("paint");
   const [brushColor, setBrushColor] = useState("#0f172a");
+  const [palette, setPalette] = useState<string[]>(
+    Array.from({ length: PALETTE_SIZE }, () => "#0f172a")
+  );
   const [isPainting, setIsPainting] = useState(false);
   const [hasPendingEdits, setHasPendingEdits] = useState(false);
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(
@@ -156,6 +170,7 @@ const ResultPanel = ({
     setIsEditing(false);
     setIsPainting(false);
     setHasPendingEdits(false);
+    setPalette(Array.from({ length: PALETTE_SIZE }, () => "#0f172a"));
     setShowHelp(false);
     setShowMoreMenu(false);
     dragState.current = null;
@@ -202,6 +217,7 @@ const ResultPanel = ({
     ctx.drawImage(image, 0, 0, width, height);
     lastLoadedUrlRef.current = url;
     setImageSize({ width, height });
+    refreshPaletteFromCanvas();
   };
 
   const loadImageFromUrl = (url: string, options?: { resetHistory?: boolean }) => {
@@ -275,6 +291,42 @@ const ResultPanel = ({
   const hasResult = Boolean(resultUrl);
   const canRestore = hasEdits && Boolean(resultOriginalUrl);
 
+  function extractPaletteFromCanvas(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      return [];
+    }
+    const { width, height } = canvas;
+    if (!width || !height) {
+      return [];
+    }
+    const data = ctx.getImageData(0, 0, width, height).data;
+    const counts = new Map<string, number>();
+    for (let i = 0; i < data.length; i += 4) {
+      const alpha = data[i + 3];
+      if (alpha === 0) {
+        continue;
+      }
+      const hex = `#${toHex(data[i])}${toHex(data[i + 1])}${toHex(data[i + 2])}`;
+      counts.set(hex, (counts.get(hex) ?? 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, PALETTE_SIZE)
+      .map(([hex]) => hex);
+  }
+
+  function refreshPaletteFromCanvas() {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      return;
+    }
+    const extracted = extractPaletteFromCanvas(canvas);
+    setPalette((prev) =>
+      normalizePalette(extracted, PALETTE_SIZE, prev[0] ?? brushColor)
+    );
+  }
+
   const getCanvasPoint = (event: ReactPointerEvent<HTMLDivElement>) => {
     const metrics = getViewportMetrics();
     if (!metrics || !imageSize) {
@@ -346,7 +398,6 @@ const ResultPanel = ({
       return;
     }
     const data = ctx.getImageData(point.x, point.y, 1, 1).data;
-    const toHex = (value: number) => value.toString(16).padStart(2, "0");
     setBrushColor(`#${toHex(data[0])}${toHex(data[1])}${toHex(data[2])}`);
   };
 
@@ -363,6 +414,7 @@ const ResultPanel = ({
     onCommitEdits(dataUrl);
     dispatchEditHistory({ type: "push", dataUrl });
     setHasPendingEdits(false);
+    refreshPaletteFromCanvas();
   };
 
   const applyHistoryEntry = (dataUrl: string) => {
@@ -399,6 +451,15 @@ const ResultPanel = ({
     }
     dispatchEditHistory({ type: "redo" });
     applyHistoryEntry(nextUrl);
+  };
+
+  const handlePaletteChange = (index: number, color: string) => {
+    setPalette((prev) => {
+      const next = [...prev];
+      next[index] = color;
+      return next;
+    });
+    setBrushColor(color);
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -795,6 +856,25 @@ const ResultPanel = ({
                   style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
                 >
                   <canvas ref={canvasRef} className="preview-image pixelated" />
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-3 rounded-xl border border-slate-200/70 bg-white/70 px-3 py-2 text-[0.6rem] text-slate-500 dark:border-slate-700/70 dark:bg-slate-900/60 dark:text-slate-300">
+                <span className="text-[0.55rem] font-semibold uppercase tracking-[0.35em] text-slate-400 dark:text-slate-500">
+                  Palette
+                </span>
+                <div className="flex flex-wrap items-center">
+                  {palette.map((color, index) => (
+                    <label key={`${color}-${index}`} className="flex items-center">
+                      <span className="sr-only">Palette color {index + 1}</span>
+                      <input
+                        type="color"
+                        value={color}
+                        onChange={(event) => handlePaletteChange(index, event.target.value)}
+                        className="h-6 w-6 cursor-pointer bg-transparent p-0"
+                        aria-label={`Palette color ${index + 1}`}
+                      />
+                    </label>
+                  ))}
                 </div>
               </div>
               <a
