@@ -33,7 +33,7 @@ export const StepPill = ({ label, tone = "light" }: StepPillProps) => (
 
 type SectionHeaderProps = {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   action?: ReactNode;
 };
 
@@ -41,7 +41,7 @@ export const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) =
   <div className="flex items-center justify-between gap-4">
     <div>
       <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
-      <p className="text-sm text-slate-500 dark:text-slate-300">{subtitle}</p>
+      {subtitle && <p className="text-sm text-slate-500 dark:text-slate-300">{subtitle}</p>}
     </div>
     {action ? <div className="shrink-0">{action}</div> : null}
   </div>

@@ -1,93 +1,45 @@
-import { Fragment, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import type { ProgressStepKey, ProgressStepState, ProgressTone } from "./types";
 import { cx, SectionHeader } from "./shared";
 
 const progressStatusClasses: Record<ProgressTone, string> = {
-  info:
-    "border-slate-200 bg-white/80 text-slate-600 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300",
-  active:
-    "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900",
-  success:
-    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-500/15 dark:text-emerald-200",
-  error:
-    "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/40 dark:bg-rose-500/15 dark:text-rose-200",
+  info: "text-slate-500 dark:text-slate-400",
+  active: "text-slate-900 dark:text-slate-100",
+  success: "text-emerald-600 dark:text-emerald-400",
+  error: "text-rose-600 dark:text-rose-400",
 };
 
-const progressStepClasses: Record<ProgressStepState, string> = {
-  idle:
-    "border-slate-200 bg-white/70 text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300",
-  active:
-    "border-slate-900 bg-slate-900 text-white shadow-[0_16px_40px_-28px_rgba(15,23,42,0.9)] dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900 dark:shadow-[0_16px_40px_-28px_rgba(8,15,30,0.8)]",
-  complete:
-    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-500/15 dark:text-emerald-200",
-  error:
-    "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/40 dark:bg-rose-500/15 dark:text-rose-200",
+const stepIconClasses: Record<ProgressStepState, string> = {
+  idle: "border-slate-200 bg-white text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500",
+  active: "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900 shadow-lg",
+  complete: "border-emerald-500 bg-emerald-500 text-white dark:border-emerald-400 dark:bg-emerald-400 dark:text-slate-900",
+  error: "border-rose-500 bg-rose-500 text-white dark:border-rose-400 dark:bg-rose-400",
 };
 
-const progressBadgeClasses: Record<ProgressStepState, string> = {
-  idle:
-    "border-slate-200 bg-white/80 text-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300",
-  active:
-    "border-white/20 bg-white/10 text-white dark:border-slate-200/60 dark:bg-slate-200/80 dark:text-slate-900",
-  complete:
-    "border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-500/25 dark:text-emerald-200",
-  error:
-    "border-rose-200 bg-rose-100 text-rose-700 dark:border-rose-400/40 dark:bg-rose-500/25 dark:text-rose-200",
-};
-
-const progressStateLabels: Record<ProgressStepState, string> = {
-  idle: "Waiting",
-  active: "In progress",
-  complete: "Done",
-  error: "Needs fix",
-};
-
-const progressConnectorToneClasses: Record<ProgressStepState, string> = {
-  idle: "bg-slate-300/70 dark:bg-slate-700/70",
-  active: "bg-slate-900/80 dark:bg-slate-100/80",
-  complete: "bg-emerald-400 dark:bg-emerald-400",
-  error: "bg-rose-400 dark:bg-rose-400",
-};
-
-const progressConnectorScaleClasses: Record<
-  ProgressStepState,
-  { vertical: string; horizontal: string }
-> = {
-  idle: { vertical: "scale-y-0", horizontal: "scale-x-0" },
-  active: { vertical: "scale-y-[0.65]", horizontal: "scale-x-[0.65]" },
-  complete: { vertical: "scale-y-[1]", horizontal: "scale-x-[1]" },
-  error: { vertical: "scale-y-[1]", horizontal: "scale-x-[1]" },
-};
-
-const progressFallbackDetails: Record<ProgressStepKey, string> = {
-  upload: "Choose an image to begin.",
-  queue: "Preparing the snap pipeline.",
-  snap: "Snapping pixels into a tighter palette.",
-  ready: "Finalizing the download.",
+const stepLabelClasses: Record<ProgressStepState, string> = {
+  idle: "text-slate-400 dark:text-slate-500",
+  active: "text-slate-900 dark:text-slate-100 font-semibold",
+  complete: "text-emerald-600 dark:text-emerald-400",
+  error: "text-rose-600 dark:text-rose-400",
 };
 
 const progressStepMeta: Array<{
   key: ProgressStepKey;
   label: string;
   icon: ReactNode;
+  completeIcon: ReactNode;
 }> = [
   {
     key: "upload",
     label: "Upload",
     icon: (
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="h-6 w-6"
-      >
-        <path d="M12 16V6" />
-        <path d="M8 10l4-4 4 4" />
-        <path d="M4 18h16" />
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+        <path d="M12 16V6M8 10l4-4 4 4" />
+      </svg>
+    ),
+    completeIcon: (
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+        <path d="M5 12l5 5L20 7" />
       </svg>
     ),
   },
@@ -95,19 +47,13 @@ const progressStepMeta: Array<{
     key: "queue",
     label: "Queue",
     icon: (
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="h-6 w-6"
-      >
-        <path d="M4 7h16" />
-        <path d="M4 12h10" />
-        <path d="M4 17h6" />
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+        <path d="M4 7h16M4 12h10M4 17h6" />
+      </svg>
+    ),
+    completeIcon: (
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+        <path d="M5 12l5 5L20 7" />
       </svg>
     ),
   },
@@ -115,20 +61,13 @@ const progressStepMeta: Array<{
     key: "snap",
     label: "Snap",
     icon: (
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="h-6 w-6"
-      >
-        <rect x="4" y="4" width="6" height="6" />
-        <rect x="14" y="4" width="6" height="6" />
-        <rect x="4" y="14" width="6" height="6" />
-        <rect x="14" y="14" width="6" height="6" />
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+        <rect x="5" y="5" width="5" height="5" /><rect x="14" y="5" width="5" height="5" /><rect x="5" y="14" width="5" height="5" /><rect x="14" y="14" width="5" height="5" />
+      </svg>
+    ),
+    completeIcon: (
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+        <path d="M5 12l5 5L20 7" />
       </svg>
     ),
   },
@@ -136,180 +75,109 @@ const progressStepMeta: Array<{
     key: "ready",
     label: "Ready",
     icon: (
-      <svg
-        aria-hidden="true"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="h-6 w-6"
-      >
-        <path d="M5 13l4 4L19 7" />
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+        <path d="M5 12l5 5L20 7" />
+      </svg>
+    ),
+    completeIcon: (
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+        <path d="M5 12l5 5L20 7" />
       </svg>
     ),
   },
 ];
 
 type ProgressStepProps = {
-  stepKey: ProgressStepKey;
-  label: string;
-  icon: ReactNode;
+  step: typeof progressStepMeta[number];
   state: ProgressStepState;
-  detail: string;
+  isLast: boolean;
+  nextState?: ProgressStepState;
 };
 
-const ProgressStep = ({ stepKey, label, icon, state, detail }: ProgressStepProps) => {
-  const isSnapActive = stepKey === "snap" && state === "active";
+const ProgressStep = ({ step, state, isLast, nextState }: ProgressStepProps) => {
+  const isActive = state === "active";
+  const isComplete = state === "complete";
+  const showIcon = isComplete ? step.completeIcon : step.icon;
 
   return (
-    <div
-      id={`progress-step-${stepKey}`}
-      aria-current={state === "active" ? "step" : undefined}
-      className={cx(
-        "group relative flex h-full flex-1 flex-col justify-between gap-4 rounded-2xl border px-4 py-4 text-left transition hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-30px_rgba(15,23,42,0.7)]",
-        progressStepClasses[state],
-        isSnapActive &&
-          "ring-2 ring-amber-400/70 shadow-[0_20px_45px_-28px_rgba(251,191,36,0.65)]"
-      )}
-    >
-      {isSnapActive ? (
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-x-4 top-3 h-1 rounded-full bg-amber-400/80 shadow-[0_0_12px_rgba(251,191,36,0.7)] motion-safe:animate-pulse"
-        />
-      ) : null}
-      <div className="flex items-start gap-3">
+    <div className="flex flex-1 items-center">
+      <div className="flex flex-col items-center gap-2">
         <div
           className={cx(
-            "flex h-11 w-11 items-center justify-center",
-            state === "active" && "motion-safe:animate-pulse"
+            "relative flex h-9 w-9 items-center justify-center rounded-full border-2 transition-all duration-300",
+            stepIconClasses[state],
+            isActive && "motion-safe:animate-pulse"
           )}
         >
-          {icon}
+          {showIcon}
+          {isActive && (
+            <span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-full border-2 border-slate-900/50 dark:border-slate-100/50 motion-safe:animate-ping"
+            />
+          )}
         </div>
-        <div className="flex flex-col gap-1">
-          <span className="text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-current opacity-70">
-            {label}
-          </span>
-          <p className="text-sm font-semibold leading-snug text-current">{detail}</p>
-        </div>
+        <span className={cx("text-xs transition-colors duration-300", stepLabelClasses[state])}>
+          {step.label}
+        </span>
       </div>
-      <span
-        className={cx(
-          "self-start rounded-full border px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.25em]",
-          progressBadgeClasses[state]
-        )}
-      >
-        {progressStateLabels[state]}
-      </span>
+
+      {!isLast && (
+        <div className="relative mx-2 h-0.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+          <div
+            className={cx(
+              "absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out",
+              state === "complete" || nextState === "active" || nextState === "complete"
+                ? "w-full bg-emerald-500 dark:bg-emerald-400"
+                : state === "active"
+                  ? "w-1/2 bg-slate-900 dark:bg-slate-100"
+                  : "w-0 bg-slate-400"
+            )}
+          />
+        </div>
+      )}
     </div>
   );
 };
-
-type ProgressConnectorProps = {
-  state: ProgressStepState;
-};
-
-const ProgressConnector = ({ state }: ProgressConnectorProps) => (
-  <div aria-hidden="true" className="flex items-center justify-center self-center">
-    <div className="relative h-6 w-1 rounded-full bg-slate-200/80 dark:bg-slate-800/80 lg:hidden">
-      <div
-        className={cx(
-          "absolute inset-0 rounded-full origin-top transition-transform duration-700",
-          progressConnectorToneClasses[state],
-          progressConnectorScaleClasses[state].vertical,
-          state === "active" && "motion-safe:animate-pulse"
-        )}
-      />
-    </div>
-    <div className="relative hidden h-1 w-12 rounded-full bg-slate-200/80 dark:bg-slate-800/80 lg:block">
-      <div
-        className={cx(
-          "absolute inset-0 rounded-full origin-left transition-transform duration-700",
-          progressConnectorToneClasses[state],
-          progressConnectorScaleClasses[state].horizontal,
-          state === "active" && "motion-safe:animate-pulse"
-        )}
-      />
-    </div>
-  </div>
-);
 
 type ProgressSectionProps = {
   label: string;
   tone: ProgressTone;
   steps: Record<ProgressStepKey, ProgressStepState>;
-  details?: Partial<Record<ProgressStepKey, string>>;
 };
 
-const ProgressSection = ({ label, tone, steps, details = {} }: ProgressSectionProps) => {
-  const snapState = steps.snap;
-  const snapDetail = details.snap ?? progressFallbackDetails.snap;
-  const showSnapCallout = snapState === "active";
-
+const ProgressSection = ({ label, tone, steps }: ProgressSectionProps) => {
   return (
-    <section className="panel-card flex flex-col gap-4 reveal" style={{ animationDelay: "140ms" }}>
+    <section className="panel-card flex flex-col gap-5 reveal" style={{ animationDelay: "140ms" }}>
       <SectionHeader
         title="Progress"
-        subtitle="A live timeline while the snap runs."
-        action={(
+        action={
           <span
             id="progress-status"
-            className={cx(
-              "rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em]",
-              progressStatusClasses[tone]
-            )}
+            className={cx("text-sm font-medium", progressStatusClasses[tone])}
             aria-live="polite"
           >
             {label}
           </span>
-        )}
+        }
       />
 
-      {showSnapCallout ? (
-        <div className="relative overflow-hidden rounded-2xl border border-amber-200/80 bg-amber-50/80 px-4 py-3 text-amber-900 shadow-[0_16px_30px_-20px_rgba(251,191,36,0.5)] dark:border-amber-400/30 dark:bg-amber-500/15 dark:text-amber-100">
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-col gap-1">
-              <span className="text-[0.6rem] font-semibold uppercase tracking-[0.35em] text-amber-700/80 dark:text-amber-100/70">
-                Snap in progress
-              </span>
-              <span className="text-sm font-semibold text-current">{snapDetail}</span>
-            </div>
-            <span className="flex items-center gap-2 rounded-full border border-amber-300/70 bg-amber-100/80 px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.25em] text-amber-800 dark:border-amber-400/40 dark:bg-amber-400/20 dark:text-amber-100">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60 motion-safe:animate-ping" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-500" />
-              </span>
-              Live
-            </span>
-          </div>
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(251,191,36,0.35),transparent_60%)]"
-          />
-        </div>
-      ) : null}
-
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-stretch lg:gap-3">
+      {/* Step indicators */}
+      <div className="flex items-start justify-between gap-1 px-1 pb-4">
+        <div className="flex-1 -m-8"/>
         {progressStepMeta.map((step, index) => {
           const state = steps[step.key];
-          const detail = details[step.key] ?? progressFallbackDetails[step.key];
+          const nextStep = progressStepMeta[index + 1];
+          const nextState = nextStep ? steps[nextStep.key] : undefined;
 
           return (
-            <Fragment key={step.key}>
-              <ProgressStep
-                stepKey={step.key}
-                label={step.label}
-                icon={step.icon}
-                state={state}
-                detail={detail}
-              />
-              {index < progressStepMeta.length - 1 ? (
-                <ProgressConnector state={state} />
-              ) : null}
-            </Fragment>
+            <ProgressStep
+              key={step.key}
+              step={step}
+              state={state}
+              isLast={index === progressStepMeta.length - 1}
+              nextState={nextState}
+            />
           );
         })}
       </div>
