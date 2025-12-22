@@ -1,15 +1,15 @@
 const howItWorksSteps = [
   {
-    title: "Quantize the palette",
-    description: "K-means clustering keeps colors tight to the size you choose.",
+    title: "Upload and set palette",
+    description: "Drop your source, then dial in the palette size before pixel snapping begins.",
   },
   {
-    title: "Lock to the grid",
-    description: "Every pixel snaps to a clean grid to remove jitter.",
+    title: "Optionally edit the result",
+    description: "Use the editing tools to tweak the processed image before export.",
   },
   {
-    title: "Grab the PNG",
-    description: "Download the processed image as a PNG file.",
+    title: "Export the PNG",
+    description: "The cleaned output is encoded as PNG so you can download it instantly.",
   },
 ];
 
