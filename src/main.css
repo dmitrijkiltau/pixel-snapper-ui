@@ -114,7 +114,7 @@
   [class^="btn-"]:not(:disabled),
   [type="button"]:not(:disabled) {
     @apply cursor-pointer;
-  },
+  }
 
   .btn-primary:disabled {
     @apply cursor-not-allowed opacity-60 hover:translate-y-0;

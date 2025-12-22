@@ -1,5 +1,5 @@
-import { useEffect, useReducer, useRef, useState } from "react";
-import type { PointerEvent as ReactPointerEvent } from "react";
+import { forwardRef, useEffect, useReducer, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent, TouchEvent as ReactTouchEvent } from "react";
 import { cx, SectionHeader, StepPill } from "./shared";
 import type { PreviewBackgroundOption } from "./types";
 
@@ -165,6 +165,13 @@ type PaintState = {
   lastY: number;
 };
 
+type TouchState = {
+  initialDistance: number;
+  initialZoom: number;
+  initialPan: { x: number; y: number };
+  initialCenter: { x: number; y: number };
+};
+
 type EditHistoryState = {
   entries: string[];
   index: number;
@@ -202,7 +209,7 @@ const editHistoryReducer = (state: EditHistoryState, action: EditHistoryAction) 
   }
 };
 
-const ResultPanel = ({
+const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
   resultId,
   resultUrl,
   resultOriginalUrl,
@@ -216,7 +223,7 @@ const ResultPanel = ({
   onToggleGrid,
   onTogglePreviewBackground,
   onClearSelection,
-}: ResultPanelProps) => {
+}, ref) => {
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -246,6 +253,7 @@ const ResultPanel = ({
   const moreMenuRef = useRef<HTMLDivElement | null>(null);
   const dragState = useRef<DragState | null>(null);
   const paintState = useRef<PaintState | null>(null);
+  const touchState = useRef<TouchState | null>(null);
   const lastLoadedUrlRef = useRef<string | null>(null);
   const shouldCenterRef = useRef(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -265,6 +273,7 @@ const ResultPanel = ({
     setShowMoreMenu(false);
     dragState.current = null;
     paintState.current = null;
+    touchState.current = null;
     lastLoadedUrlRef.current = null;
     shouldCenterRef.current = true;
     setImageSize(null);
@@ -700,6 +709,7 @@ const ResultPanel = ({
       return;
     }
 
+    // Right-click always pans
     if (event.button === 2) {
       event.preventDefault();
       event.currentTarget.setPointerCapture(event.pointerId);
@@ -714,7 +724,13 @@ const ResultPanel = ({
       return;
     }
 
+    // In editing mode, single touch/click paints; two-finger is handled by touch events
     if (isEditing) {
+      // Skip if a two-finger gesture is active
+      if (touchState.current) {
+        return;
+      }
+      
       const point = getCanvasPoint(event);
       if (!point) {
         return;
@@ -743,6 +759,7 @@ const ResultPanel = ({
       return;
     }
 
+    // In preview mode, one finger pans
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
     dragState.current = {
@@ -774,6 +791,92 @@ const ResultPanel = ({
     const nextX = drag.originX + (event.clientX - drag.startX);
     const nextY = drag.originY + (event.clientY - drag.startY);
     setPan({ x: nextX, y: nextY });
+  };
+
+  const getTouchDistance = (touches: React.TouchList) => {
+    if (touches.length < 2) return 0;
+    const dx = touches[1].clientX - touches[0].clientX;
+    const dy = touches[1].clientY - touches[0].clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+
+  const getTouchCenter = (touches: React.TouchList) => {
+    if (touches.length < 2) {
+      return { x: touches[0].clientX, y: touches[0].clientY };
+    }
+    return {
+      x: (touches[0].clientX + touches[1].clientX) / 2,
+      y: (touches[0].clientY + touches[1].clientY) / 2,
+    };
+  };
+
+  const handleTouchStart = (event: ReactTouchEvent<HTMLDivElement>) => {
+    if (!hasResult) return;
+    
+    // Two-finger gesture for pan/zoom
+    if (event.touches.length === 2) {
+      event.preventDefault();
+      const distance = getTouchDistance(event.touches);
+      const center = getTouchCenter(event.touches);
+      touchState.current = {
+        initialDistance: distance,
+        initialZoom: zoom,
+        initialPan: { ...pan },
+        initialCenter: center,
+      };
+      return;
+    }
+  };
+
+  const handleTouchMove = (event: ReactTouchEvent<HTMLDivElement>) => {
+    if (!hasResult) return;
+    
+    // Handle two-finger pan/zoom
+    if (event.touches.length === 2 && touchState.current) {
+      event.preventDefault();
+      const touch = touchState.current;
+      const currentDistance = getTouchDistance(event.touches);
+      const currentCenter = getTouchCenter(event.touches);
+      
+      // Calculate new zoom based on pinch
+      const scale = currentDistance / touch.initialDistance;
+      const nextZoom = clamp(touch.initialZoom * scale, MIN_ZOOM, MAX_ZOOM);
+      
+      // Get viewport metrics for coordinate conversion
+      const metrics = getViewportMetrics();
+      if (!metrics) return;
+      const { rect, paddingLeft, paddingTop, borderLeft, borderTop } = metrics;
+      
+      // Calculate the focal point in viewport coordinates (initial center)
+      const focalX = touch.initialCenter.x - rect.left - borderLeft - paddingLeft;
+      const focalY = touch.initialCenter.y - rect.top - borderTop - paddingTop;
+      
+      // Calculate image coordinates at the focal point with initial zoom
+      const imageX = (focalX - touch.initialPan.x) / touch.initialZoom;
+      const imageY = (focalY - touch.initialPan.y) / touch.initialZoom;
+      
+      // Calculate new pan to keep the focal point stationary after zoom
+      const zoomedPanX = focalX - imageX * nextZoom;
+      const zoomedPanY = focalY - imageY * nextZoom;
+      
+      // Add two-finger pan offset
+      const panDeltaX = currentCenter.x - touch.initialCenter.x;
+      const panDeltaY = currentCenter.y - touch.initialCenter.y;
+      
+      setZoom(nextZoom);
+      setPan({
+        x: zoomedPanX + panDeltaX,
+        y: zoomedPanY + panDeltaY,
+      });
+      return;
+    }
+  };
+
+  const handleTouchEnd = (event: ReactTouchEvent<HTMLDivElement>) => {
+    // End two-finger gesture when fewer than 2 touches remain
+    if (event.touches.length < 2) {
+      touchState.current = null;
+    }
   };
 
   const handlePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -928,7 +1031,7 @@ const ResultPanel = ({
   };
 
   return (
-    <section className="panel-card flex flex-col gap-5 reveal" style={{ animationDelay: "220ms" }}>
+    <section ref={ref} className="panel-card flex flex-col gap-5 reveal" style={{ animationDelay: "220ms" }}>
       <SectionHeader
         title="Result"
         subtitle="PNG preview with crisp grid edges."
@@ -938,14 +1041,16 @@ const ResultPanel = ({
       {showHelp && hasResult ? (
         <div className="rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-[0.7rem] text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300">
           <ul className="list-disc space-y-1 pl-4">
-            <li>Scroll to zoom</li>
-            <li>Right-click or drag to pan</li>
+            <li>Scroll or pinch to zoom</li>
             {isEditing ? (
               <>
-                <li>Click to {editTool === "fill" ? "fill" : editTool === "erase" ? "erase" : "paint"}</li>
+                <li>Two-finger pan or right-click drag</li>
+                <li>One-finger/click to {editTool === "fill" ? "fill" : editTool === "erase" ? "erase" : "paint"}</li>
                 <li>Alt+click to sample color</li>
               </>
-            ) : null}
+            ) : (
+              <li>One-finger/drag or right-click to pan</li>
+            )}
           </ul>
         </div>
       ) : null}
@@ -1152,8 +1257,12 @@ const ResultPanel = ({
                   onPointerDown={handlePointerDown}
                   onPointerMove={handlePointerMove}
                   onPointerUp={handlePointerUp}
-                onPointerCancel={handlePointerUp}
-                onContextMenu={(event) => event.preventDefault()}
+                  onPointerCancel={handlePointerUp}
+                  onTouchStart={handleTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                  onTouchCancel={handleTouchEnd}
+                  onContextMenu={(event) => event.preventDefault()}
               >
                 <div className="pointer-events-none absolute right-3 top-3 z-10 flex items-center gap-2 opacity-0 transition group-hover:opacity-100">
                   <button
@@ -1405,6 +1514,8 @@ const ResultPanel = ({
       </dialog>
     </section>
   );
-};
+});
+
+ResultPanel.displayName = "ResultPanel";
 
 export default ResultPanel;

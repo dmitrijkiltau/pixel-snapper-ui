@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import AppFooter from "./components/AppFooter";
 import HeroHeader from "./components/HeroHeader";
@@ -249,6 +249,13 @@ const App = () => {
     () => loadPreviewBackgroundPreference()
   );
   const [showPreviewGrid, setShowPreviewGrid] = useState(() => loadGridPreference());
+  const resultPanelRef = useRef<HTMLElement>(null);
+
+  const scrollToResultPanel = () => {
+    requestAnimationFrame(() => {
+      resultPanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  };
 
   useEffect(() => {
     let items = loadHistory();
@@ -450,6 +457,7 @@ const App = () => {
       pushHistoryItem(entry);
       setStatus("Snapped. Your download is ready.", "success");
       updateProgress("complete");
+      scrollToResultPanel();
     } catch (error) {
       const message =
         error instanceof Error && error.message
@@ -504,6 +512,7 @@ const App = () => {
       pushHistoryItem(entry);
       setStatus("Loaded into the editor. Paint without snapping.", "success");
       updateProgress("ready");
+      scrollToResultPanel();
     } catch (error) {
       const message =
         error instanceof Error && error.message
@@ -576,6 +585,7 @@ const App = () => {
   const handleSelectHistory = (id: string) => {
     setActiveHistoryId(id);
     setStatus("History entry loaded into the editor.", "info");
+    scrollToResultPanel();
   };
 
   const handleClearHistory = () => {
@@ -649,6 +659,7 @@ const App = () => {
           />
 
         <ResultPanel
+          ref={resultPanelRef}
           resultId={activeResult?.id ?? null}
           resultUrl={activeResult?.dataUrl ?? null}
           resultOriginalUrl={activeResult?.originalDataUrl ?? null}

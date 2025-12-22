@@ -148,38 +148,43 @@ type ProgressSectionProps = {
 
 const ProgressSection = ({ label, tone, steps }: ProgressSectionProps) => {
   return (
-    <section className="panel-card flex flex-col gap-5 reveal" style={{ animationDelay: "140ms" }}>
-      <SectionHeader
-        title="Progress"
-        action={
-          <span
-            id="progress-status"
-            className={cx("text-sm font-medium", progressStatusClasses[tone])}
-            aria-live="polite"
-          >
-            {label}
-          </span>
-        }
-      />
+    <section className="reveal" style={{ animationDelay: "140ms" }}>
+      {/* Non-sticky title row */}
+      <div className="panel-card mb-0 rounded-b-none border-b-0 pb-0">
+        <SectionHeader
+          title="Progress"
+          action={
+            <span
+              id="progress-status"
+              className={cx("text-sm font-medium", progressStatusClasses[tone])}
+              aria-live="polite"
+            >
+              {label}
+            </span>
+          }
+        />
+      </div>
 
-      {/* Step indicators */}
-      <div className="flex items-start justify-between gap-1 px-1 pb-4">
-        <div className="flex-1 -m-8"/>
-        {progressStepMeta.map((step, index) => {
-          const state = steps[step.key];
-          const nextStep = progressStepMeta[index + 1];
-          const nextState = nextStep ? steps[nextStep.key] : undefined;
+      {/* Sticky step indicators */}
+      <div className="sticky top-0 z-20 panel-card mt-0 rounded-t-none border-t-0 pt-0">
+        <div className="flex items-start justify-between gap-1 px-1 py-4">
+          <div className="flex-1 -m-8"/>
+          {progressStepMeta.map((step, index) => {
+            const state = steps[step.key];
+            const nextStep = progressStepMeta[index + 1];
+            const nextState = nextStep ? steps[nextStep.key] : undefined;
 
-          return (
-            <ProgressStep
-              key={step.key}
-              step={step}
-              state={state}
-              isLast={index === progressStepMeta.length - 1}
-              nextState={nextState}
-            />
-          );
-        })}
+            return (
+              <ProgressStep
+                key={step.key}
+                step={step}
+                state={state}
+                isLast={index === progressStepMeta.length - 1}
+                nextState={nextState}
+              />
+            );
+          })}
+        </div>
       </div>
     </section>
   );
