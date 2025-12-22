@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { PointerEvent as ReactPointerEvent, WheelEvent as ReactWheelEvent } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import { cx, SectionHeader, StepPill } from "./shared";
 
 const MIN_ZOOM = 0.5;
@@ -98,30 +98,37 @@ const ResultPanel = ({
     setIsDragging(false);
   };
 
-  const handleWheel = (event: ReactWheelEvent<HTMLDivElement>) => {
-    if (!hasResult) {
-      return;
-    }
-
+  useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) {
       return;
     }
-    const rect = viewport.getBoundingClientRect();
-    const offsetX = event.clientX - rect.left;
-    const offsetY = event.clientY - rect.top;
-    const zoomFactor = event.deltaY < 0 ? 1.12 : 0.88;
-    const nextZoom = clamp(zoom * zoomFactor, MIN_ZOOM, MAX_ZOOM);
-    if (nextZoom === zoom) {
-      return;
-    }
-    const imageX = (offsetX - pan.x) / zoom;
-    const imageY = (offsetY - pan.y) / zoom;
-    const nextX = offsetX - imageX * nextZoom;
-    const nextY = offsetY - imageY * nextZoom;
-    setZoom(nextZoom);
-    setPan({ x: nextX, y: nextY });
-  };
+
+    const handleWheel = (event: WheelEvent) => {
+      if (!hasResult) {
+        return;
+      }
+      event.preventDefault();
+
+      const rect = viewport.getBoundingClientRect();
+      const offsetX = event.clientX - rect.left;
+      const offsetY = event.clientY - rect.top;
+      const zoomFactor = event.deltaY < 0 ? 1.12 : 0.88;
+      const nextZoom = clamp(zoom * zoomFactor, MIN_ZOOM, MAX_ZOOM);
+      if (nextZoom === zoom) {
+        return;
+      }
+      const imageX = (offsetX - pan.x) / zoom;
+      const imageY = (offsetY - pan.y) / zoom;
+      const nextX = offsetX - imageX * nextZoom;
+      const nextY = offsetY - imageY * nextZoom;
+      setZoom(nextZoom);
+      setPan({ x: nextX, y: nextY });
+    };
+
+    viewport.addEventListener("wheel", handleWheel, { passive: false });
+    return () => viewport.removeEventListener("wheel", handleWheel);
+  }, [hasResult, pan.x, pan.y, zoom]);
 
   return (
     <section className="panel-card flex flex-col gap-5 reveal" style={{ animationDelay: "220ms" }}>
@@ -169,7 +176,6 @@ const ResultPanel = ({
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
                 onPointerCancel={handlePointerUp}
-                onWheel={handleWheel}
               >
                 <div
                   className="preview-canvas"
