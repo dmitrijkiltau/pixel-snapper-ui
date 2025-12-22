@@ -912,7 +912,7 @@ const ResultPanel = ({
 
           {/* Editing tools - only shown when editing */}
           {isEditing ? (
-            <>
+            <div className="flex items-center gap-2 slide-in-left">
               {/* Divider */}
               <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" />
 
@@ -994,7 +994,7 @@ const ResultPanel = ({
                   <IconRedo />
                 </button>
               </div>
-            </>
+            </div>
           ) : null}
 
           {/* Spacer */}

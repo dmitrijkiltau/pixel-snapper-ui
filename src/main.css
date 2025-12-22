@@ -116,6 +116,10 @@
     animation: reveal 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
 
+  .slide-in-left {
+    animation: slide-in-left 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
   .pixelated {
     image-rendering: pixelated;
     image-rendering: crisp-edges;
@@ -164,6 +168,17 @@
   }
 }
 
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 @keyframes toast-timer {
   from {
     transform: scaleX(1);
@@ -184,6 +199,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .reveal {
+    animation: none;
+  }
+
+  .slide-in-left {
     animation: none;
   }
 }
