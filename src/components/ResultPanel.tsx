@@ -5,7 +5,7 @@ import type { PreviewBackgroundOption } from "./types";
 
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 8;
-const PALETTE_SIZE = 10;
+const PALETTE_SIZE = 12;
 
 type PaletteEntry = {
   color: string;
@@ -130,9 +130,9 @@ const normalizePalette = (entries: PaletteEntry[], size: number, fallbackColor: 
 
 const formatPercentage = (value: number) => {
   if (!Number.isFinite(value)) {
-    return "0.00%";
+    return "0.00 %";
   }
-  return `${value.toFixed(2)}%`;
+  return `${value.toFixed(2)} %`;
 };
 
 type ResultPanelProps = {
@@ -1203,23 +1203,25 @@ const ResultPanel = ({
                 <div className="flex flex-wrap items-center gap-2">
                   {palette.map((entry, index) => {
                     const { color, percentage } = entry;
+                    const isCopied = copiedColor === color;
+                    const displayColor = isCopied ? "copied" : color.toUpperCase();
                     if (!isEditing) {
                       return (
                         <button
                           key={`${color}-${index}`}
                           type="button"
                           onClick={() => copyPaletteColor(color)}
-                          className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-2 py-1 text-[0.55rem] font-medium text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100"
+                          className="inline-flex items-center gap-3 rounded-full border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100"
                           aria-label={`Copy palette color ${color}`}
-                          title="Copy hex"
+                          title="Copy HEX color to clipboard"
                         >
                           <span
                             className="h-4 w-4 rounded-full border border-slate-200 dark:border-slate-700"
                             style={{ backgroundColor: color }}
                           />
                           <span className="flex items-center gap-1">
-                            <span>{copiedColor === color ? "Copied" : color}</span>
-                            <span className="rounded-full border border-slate-200/80 bg-slate-100 px-2 py-0.5 text-[0.55rem] font-semibold text-slate-600 dark:border-slate-700/80 dark:bg-slate-800/60 dark:text-slate-200">
+                            <span className="hex-mono">{displayColor}</span>
+                            <span className="percentage-pill hex-mono rounded-full border border-slate-200/80 bg-slate-100 px-2 py-0.5 text-[0.6rem] font-semibold text-slate-600 uppercase dark:border-slate-700/80 dark:bg-slate-800/60 dark:text-slate-200">
                               {formatPercentage(percentage)}
                             </span>
                           </span>

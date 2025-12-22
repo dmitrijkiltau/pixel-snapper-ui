@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
 @source "../index.html";
@@ -7,7 +7,7 @@
 @layer base {
   :root {
     --font-sans: "Sora", "Avenir Next", "Avenir", "Segoe UI", sans-serif;
-    --font-mono: "Space Mono", "SFMono-Regular", "Menlo", monospace;
+    --font-mono: "JetBrains Mono", "Space Mono", "SFMono-Regular", "Menlo", monospace;
     --ink: #12131a;
     --paper: #f5f0e6;
     --grid-color: 15 23 42;
@@ -85,6 +85,14 @@
 
   .step-pill {
     @apply rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em];
+  }
+
+  .hex-mono {
+    @apply font-mono uppercase;
+  }
+
+  .percentage-pill {
+    @apply inline-flex justify-end min-w-14 text-right;
   }
 
   .details-summary {
