@@ -679,14 +679,14 @@ const ResultPanel = ({
     } catch {
       // ignore copy failures, still show feedback
     } finally {
-      showPaletteFeedback(color, "Copied");
+      showPaletteFeedback(color, "copied");
     }
   };
 
   const handlePaletteSegmentAction = (color: string) => {
     if (isEditing) {
       setBrushColor(color);
-      showPaletteFeedback(color, "Brush color set");
+      showPaletteFeedback(color, "color set");
       return;
     }
     copyPaletteColor(color);
@@ -1225,7 +1225,7 @@ const ResultPanel = ({
                   Palette
                 </span>
                 <div className="flex flex-col gap-2 px-1 pb-1">
-                  <div className="relative flex h-12 overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100/80 shadow-inner dark:border-slate-700/80 dark:bg-slate-950">
+                  <div className="relative flex h-12 overflow-visible rounded-2xl border border-slate-200/80 bg-slate-100/80 shadow-inner dark:border-slate-700/80 dark:bg-slate-950">
                     <div className="flex h-full w-full">
                       {paletteSegments.map((segment, index) => {
                         if (segment.usageWidth <= 0) {
@@ -1239,17 +1239,24 @@ const ResultPanel = ({
                             key={`${segment.color}-${index}`}
                             type="button"
                             onClick={() => handlePaletteSegmentAction(segment.color)}
-                            className="group relative h-full border-0 p-0 text-transparent transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500"
+                            className="group relative h-full border-0 p-0 text-transparent transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500"
                             style={{
                               width: `${segment.usageWidth}%`,
                               backgroundColor: segment.color,
                             }}
-                            title={`${segment.color} • ${usageLabel}`}
                             aria-label={`${actionLabel} ${segment.color}`}
                           >
-                            <div className="pointer-events-none absolute left-1/2 -top-11 flex -translate-x-1/2 flex-col items-center gap-1">
+                            <div className="pointer-events-none absolute left-1/2 -top-2.5 flex -translate-x-1/2 flex-col items-center gap-1 z-10">
                               {feedbackMatch && paletteFeedback?.label ? (
-                                <span className="inline-flex items-center rounded-full border border-slate-900/20 bg-slate-900/80 px-2 py-0.5 text-[0.55rem] font-semibold text-white transition-all duration-150 dark:border-slate-100/20 dark:bg-slate-50/90 dark:text-slate-900">
+                                <span
+                                  className={cx(
+                                    "inline-flex items-center whitespace-nowrap rounded-full border px-2 py-0.5 text-[0.55rem] font-semibold transition-all duration-150",
+                                    feedbackMatch
+                                      ? "opacity-100"
+                                      : "opacity-0 group-hover:opacity-100",
+                                    "border-slate-900/20 bg-slate-900/80 text-white dark:border-slate-100/20 dark:bg-slate-50/90 dark:text-slate-900"
+                                  )}
+                                >
                                   {paletteFeedback.label}
                                 </span>
                               ) : null}
@@ -1263,7 +1270,7 @@ const ResultPanel = ({
                       {paletteOthersWidth > 0 && (
                         <div
                           aria-hidden="true"
-                          className="pointer-events-none h-full bg-gradient-to-r from-white/60 to-white/0 dark:from-slate-900/80 dark:to-slate-900/20"
+                          className="pointer-events-none h-full bg-linear-to from-white/60 to-white/0 dark:from-slate-900/80 dark:to-slate-900/20"
                           style={{ width: `${paletteOthersWidth}%` }}
                         />
                       )}
