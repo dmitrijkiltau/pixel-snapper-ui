@@ -112,6 +112,22 @@ const toSafeEditName = (originalName: string) => {
   return `edited-${safeBase}.png`;
 };
 
+const generateRandomSeed = () => {
+  const fallback = () => {
+    const value = Math.floor(Math.random() * 0x100000000);
+    return value === 0 ? 1 : value;
+  };
+
+  if (typeof crypto !== "undefined" && typeof crypto.getRandomValues === "function") {
+    const buffer = new Uint32Array(1);
+    crypto.getRandomValues(buffer);
+    const value = buffer[0];
+    return value === 0 ? fallback() : value;
+  }
+
+  return fallback();
+};
+
 const blobToDataUrl = (blob: Blob) =>
   new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
@@ -202,7 +218,7 @@ const App = () => {
   const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
   const [kColorsValue, setKColorsValue] = useState("16");
-  const [kSeedValue, setKSeedValue] = useState("42");
+  const [kSeedValue, setKSeedValue] = useState("0");
 
   useEffect(() => {
     let items = loadHistory();
@@ -348,11 +364,12 @@ const App = () => {
         setConfigError("k_seed must be >= 0");
         return;
       }
+      const seedForProcessing = parsedSeed === 0 ? generateRandomSeed() : parsedSeed;
 
       updateProgress("processing");
       const blob = await processImageBlob(selectedFile, {
         kColors: parsedColors,
-        kSeed: parsedSeed,
+        kSeed: seedForProcessing,
       });
       if (!blob || blob.size === 0) {
         throw new Error("No output generated. Try a different image.");
@@ -376,7 +393,7 @@ const App = () => {
         width: dimensions?.width,
         height: dimensions?.height,
         kColors: parsedColors,
-        kSeed: parsedSeed,
+        kSeed: seedForProcessing,
       };
       pushHistoryItem(entry);
       setStatus("Snapped. Your download is ready.", "success");

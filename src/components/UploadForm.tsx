@@ -86,7 +86,7 @@ const UploadForm = ({
         <span className="text-xs font-normal text-slate-500 dark:text-slate-400">1 to 256 colors.</span>
       </label>
       <label className="flex flex-col gap-2 text-sm font-semibold text-slate-800 dark:text-slate-200">
-        <span>Seed</span>
+        <span>Seed (0 = random)</span>
         <input
           type="number"
           name="k_seed"
@@ -95,7 +95,9 @@ const UploadForm = ({
           onChange={(event) => onKSeedChange(event.target.value)}
           className="rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-slate-200 dark:focus:ring-slate-200/20"
         />
-        <span className="text-xs font-normal text-slate-500 dark:text-slate-400">Keep results deterministic.</span>
+        <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
+          Enter a number to reproduce results, or keep 0 to reroll each snap.
+        </span>
       </label>
     </div>
 
