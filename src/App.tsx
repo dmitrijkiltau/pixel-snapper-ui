@@ -242,9 +242,10 @@ const App = () => {
       }
       return;
     }
-    const exists = activeHistoryId
-      ? historyItems.some((item) => item.id === activeHistoryId)
-      : false;
+    if (!activeHistoryId) {
+      return;
+    }
+    const exists = historyItems.some((item) => item.id === activeHistoryId);
     if (!exists) {
       setActiveHistoryId(historyItems[0]?.id ?? null);
     }
@@ -498,13 +499,9 @@ const App = () => {
     );
   };
 
-  const handleRemoveResult = () => {
-    if (!activeHistoryId) {
-      return;
-    }
-    setHistoryItems((prev) => prev.filter((item) => item.id !== activeHistoryId));
+  const handleClearSelection = () => {
     setActiveHistoryId(null);
-    setStatus("Result removed.", "info");
+    setStatus("Selection cleared.", "info");
   };
 
   const handleSelectHistory = (id: string) => {
@@ -531,54 +528,6 @@ const App = () => {
     () => ({ ...progressConfig.steps, ...(progressOverrides.steps || {}) }),
     [progressConfig.steps, progressOverrides.steps]
   );
-  const progressDetails = useMemo(() => {
-    const snapConfig = `${kColorsValue} colors, seed ${kSeedValue}`;
-    const uploadDetail =
-      progressSteps.upload === "error"
-        ? "Image required"
-        : selectedFile
-          ? "Image locked in"
-          : "Choose an image to begin";
-    const queueDetail =
-      progressSteps.queue === "complete"
-        ? "Settings verified"
-        : progressSteps.queue === "active"
-          ? "Checking palette settings"
-          : progressSteps.queue === "error"
-            ? "Fix palette settings"
-            : "Waiting on upload";
-    const snapDetail =
-      progressSteps.snap === "complete"
-        ? `Snapped at ${snapConfig}`
-        : progressSteps.snap === "active"
-          ? `Snapping to ${snapConfig}`
-          : progressSteps.snap === "error"
-            ? "Snap failed. Check settings."
-            : `Ready for ${snapConfig}`;
-    const readyDetail =
-      progressSteps.ready === "complete"
-        ? "Download ready"
-        : progressSteps.ready === "active"
-          ? "Packaging download"
-          : progressSteps.ready === "error"
-            ? "Download failed"
-            : "Awaiting snap";
-
-    return {
-      upload: uploadDetail,
-      queue: queueDetail,
-      snap: snapDetail,
-      ready: readyDetail,
-    };
-  }, [
-    kColorsValue,
-    kSeedValue,
-    progressSteps.queue,
-    progressSteps.ready,
-    progressSteps.snap,
-    progressSteps.upload,
-    selectedFile,
-  ]);
 
   const statusClassName = cx(
     "fixed bottom-6 left-1/2 z-30 w-[min(92vw,420px)] -translate-x-1/2 rounded-2xl border px-4 py-3 pr-10 text-sm font-semibold shadow-lg backdrop-blur",
@@ -604,10 +553,9 @@ const App = () => {
           label={progressLabel}
           tone={progressTone}
           steps={progressSteps}
-          details={progressDetails}
         />
 
-        <section className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr]">
           <UploadForm
             isLoading={isLoading}
             canEditInput={Boolean(selectedFile)}
@@ -632,7 +580,7 @@ const App = () => {
             hasEdits={hasEdits}
             onCommitEdits={handleCommitEdits}
             onDiscardEdits={handleDiscardEdits}
-            onRemoveResult={handleRemoveResult}
+            onClearSelection={handleClearSelection}
           />
         </section>
 

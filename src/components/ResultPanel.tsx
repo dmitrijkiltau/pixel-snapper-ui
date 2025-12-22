@@ -69,7 +69,7 @@ type ResultPanelProps = {
   hasEdits: boolean;
   onCommitEdits: (dataUrl: string) => void;
   onDiscardEdits: () => void;
-  onRemoveResult: () => void;
+  onClearSelection: () => void;
 };
 
 type DragState = {
@@ -132,7 +132,7 @@ const ResultPanel = ({
   hasEdits,
   onCommitEdits,
   onDiscardEdits,
-  onRemoveResult,
+  onClearSelection,
 }: ResultPanelProps) => {
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -833,11 +833,11 @@ const ResultPanel = ({
                   type="button"
                   onClick={() => {
                     setShowMoreMenu(false);
-                    onRemoveResult();
+                    onClearSelection();
                   }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-rose-600 transition hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-500/10"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-slate-600 transition hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
                 >
-                  Remove result
+                  Clear selection
                 </button>
               </div>
             ) : null}

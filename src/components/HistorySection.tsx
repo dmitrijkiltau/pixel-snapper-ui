@@ -67,7 +67,7 @@ const HistoryCard = ({ item, isActive, onSelect, onDelete }: HistoryCardProps) =
         {seedLabel ? <span>Seed: {seedLabel}</span> : null}
         {item.sourceName ? <span>Source: {item.sourceName}</span> : null}
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2 mt-3">
         <button
           type="button"
           onClick={() => onSelect(item.id)}
@@ -189,7 +189,7 @@ const HistorySection = ({
         </button>
       </div>
 
-      <div id="history" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite">
+      <div id="history" className="grid items-start gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite">
         {items.length === 0 ? (
           <HistoryEmpty />
         ) : (
