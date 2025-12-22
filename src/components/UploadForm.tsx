@@ -58,13 +58,13 @@ const UploadForm = ({
       />
       <span className="text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500 dark:text-slate-400">Image</span>
       <span className="text-base font-semibold text-slate-900 dark:text-slate-100">Drop a file or click to browse</span>
-      <span id="file-name" className="font-[var(--font-mono)] text-xs text-slate-500 dark:text-slate-400">
+      <span id="file-name" className="font-mono text-xs text-slate-500 dark:text-slate-400">
         {uploadFileName}
       </span>
       {uploadPreviewUrl ? (
         <img
           id="upload-preview"
-          className="pixelated mt-3 max-h-[240px] w-full object-contain p-3"
+          className="pixelated mt-3 max-h-60 w-full object-contain p-3"
           src={uploadPreviewUrl}
           alt={uploadPreviewAlt}
         />
