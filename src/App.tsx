@@ -572,7 +572,7 @@ const App = () => {
           steps={progressSteps}
         />
 
-        <section className="grid items-start gap-8 lg:grid-cols-[1.05fr_0.95fr]">
+        <section className="grid items-start gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <UploadForm
             isLoading={isLoading}
             canEditInput={Boolean(selectedFile)}
