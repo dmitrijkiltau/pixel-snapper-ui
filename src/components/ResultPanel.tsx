@@ -785,16 +785,19 @@ const ResultPanel = ({
   };
 
   const cursorClassName = hasResult
-    ? isEditing
-      ? "cursor-default"
-      : isDragging
-        ? "cursor-grabbing"
+    ? isDragging
+      ? "cursor-grabbing"
+      : isEditing
+        ? "cursor-default"
         : "cursor-grab"
     : "cursor-default";
 
-  const viewportStyle = isEditing
-    ? { backgroundColor: previewBackgroundColor, cursor: toolCursor(editTool, brushColor) }
-    : { backgroundColor: previewBackgroundColor };
+  const shouldShowToolCursor = isEditing && !isDragging && !isPainting;
+
+  const viewportStyle = {
+    backgroundColor: previewBackgroundColor,
+    ...(shouldShowToolCursor ? { cursor: toolCursor(editTool, brushColor) } : {}),
+  };
 
   return (
     <section className="panel-card flex flex-col gap-5 reveal" style={{ animationDelay: "220ms" }}>
@@ -1004,10 +1007,11 @@ const ResultPanel = ({
             <>
                 <div
                   ref={viewportRef}
-                  className={cx(
-                    "preview-viewport group relative w-full rounded-2xl border border-slate-200/70 bg-white/70 p-4 sm:p-6 dark:border-slate-700/70 dark:bg-slate-900/60",
-                    cursorClassName
-                  )}
+                className={cx(
+                  "preview-viewport group relative w-full rounded-2xl border border-slate-200/70 bg-white/70 p-4 sm:p-6 dark:border-slate-700/70 dark:bg-slate-900/60",
+                  cursorClassName,
+                  isPainting && "cursor-crosshair"
+                )}
                   style={viewportStyle}
                   onPointerDown={handlePointerDown}
                   onPointerMove={handlePointerMove}
