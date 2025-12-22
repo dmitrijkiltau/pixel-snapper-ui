@@ -271,7 +271,7 @@ const ResultPanel = ({
   const canRedo =
     editHistory.index >= 0 && editHistory.index < editHistory.entries.length - 1;
   const getCanvasContext = (canvas: HTMLCanvasElement) => {
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) {
       return null;
     }
@@ -1131,7 +1131,7 @@ const ResultPanel = ({
                 ) : null}
                 <div
                   className="preview-canvas relative"
-                  style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
+                  style={{ transform: `translate(${Math.round(pan.x)}px, ${Math.round(pan.y)}px) scale(${zoom})` }}
                 >
                   <div
                     className={cx(
