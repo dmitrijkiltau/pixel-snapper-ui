@@ -45,7 +45,7 @@ const ResultPanel = ({
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editTool, setEditTool] = useState<"paint" | "erase" | "pan">("paint");
+  const [editTool, setEditTool] = useState<"paint" | "erase">("paint");
   const [brushColor, setBrushColor] = useState("#0f172a");
   const [isPainting, setIsPainting] = useState(false);
   const [hasPendingEdits, setHasPendingEdits] = useState(false);
@@ -241,11 +241,25 @@ const ResultPanel = ({
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (!hasResult || event.button !== 0) {
+    if (!hasResult || (event.button !== 0 && event.button !== 2)) {
       return;
     }
 
-    if (isEditing && editTool !== "pan") {
+    if (event.button === 2) {
+      event.preventDefault();
+      event.currentTarget.setPointerCapture(event.pointerId);
+      dragState.current = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        originX: pan.x,
+        originY: pan.y,
+      };
+      setIsDragging(true);
+      return;
+    }
+
+    if (isEditing) {
       const point = getCanvasPoint(event);
       if (!point) {
         return;
@@ -378,7 +392,7 @@ const ResultPanel = ({
   };
 
   const cursorClassName = hasResult
-    ? isEditing && editTool !== "pan"
+    ? isEditing
       ? "cursor-crosshair"
       : isDragging
         ? "cursor-grabbing"
@@ -405,10 +419,11 @@ const ResultPanel = ({
               <span className="tag-pill">
                 {isEditing && editTool === "erase"
                   ? "Drag to erase"
-                  : isEditing && editTool === "paint"
+                  : isEditing
                     ? "Drag to paint"
                     : "Drag to pan"}
               </span>
+              <span className="tag-pill">Right click to pan</span>
               {hasEdits ? <span className="tag-pill">Edited</span> : null}
             </>
           ) : null}
@@ -459,19 +474,6 @@ const ResultPanel = ({
                 >
                   Erase
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setEditTool("pan")}
-                  className={cx(
-                    "rounded-full px-3 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.25em] transition",
-                    editTool === "pan"
-                      ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
-                      : "text-slate-500 hover:text-slate-900 dark:text-slate-300 dark:hover:text-slate-100"
-                  )}
-                  aria-pressed={editTool === "pan"}
-                >
-                  Pan
-                </button>
               </div>
               <label className="flex items-center gap-2 rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-slate-600 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200">
                 Brush
@@ -517,6 +519,7 @@ const ResultPanel = ({
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
                 onPointerCancel={handlePointerUp}
+                onContextMenu={(event) => event.preventDefault()}
               >
                 <div
                   className="preview-canvas"
