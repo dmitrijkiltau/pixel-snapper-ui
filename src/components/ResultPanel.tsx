@@ -19,18 +19,17 @@ const IconRedo = () => (
 );
 
 const IconMoreVertical = () => (
-  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
-    <circle cx="12" cy="5" r="1.5" />
-    <circle cx="12" cy="12" r="1.5" />
-    <circle cx="12" cy="19" r="1.5" />
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+    <path d="M8 12H8.00901M12.0045 12H12.0135M15.991 12H16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
   </svg>
 );
 
 const IconHelp = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5">
-    <path d="M12 17V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M12 17V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
     <circle cx="1" cy="1" r="1" transform="matrix(1 0 0 -1 11 9)" fill="currentColor"/>
-    <path d="M2 12C2 7.28595 2 4.92893 3.46447 3.46447C4.92893 2 7.28595 2 12 2C16.714 2 19.0711 2 20.5355 3.46447C22 4.92893 22 7.28595 22 12C22 16.714 22 19.0711 20.5355 20.5355C19.0711 22 16.714 22 12 22C7.28595 22 4.92893 22 3.46447 20.5355C2 19.0711 2 16.714 2 12Z" stroke="currentColor" strokeWidth="1.5"/>
   </svg>
 );
 
@@ -807,32 +806,6 @@ const ResultPanel = ({
         action={<StepPill label="Step 2" />}
       />
 
-      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-300">
-        <div className="flex items-center gap-2">
-          {dimensionLabel ? (
-            <span className="tag-pill">{dimensionLabel}</span>
-          ) : null}
-          {hasEdits ? <span className="tag-pill bg-amber-50 text-amber-600 dark:bg-amber-500/15 dark:text-amber-300">Edited</span> : null}
-        </div>
-        {hasResult ? (
-          <button
-            type="button"
-            onClick={() => setShowHelp((prev) => !prev)}
-            className={cx(
-              "inline-flex items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.6rem] font-medium transition",
-              showHelp
-                ? "border-slate-300 bg-slate-100 text-slate-700 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200"
-                : "border-slate-200 bg-white/80 text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-300"
-            )}
-            aria-pressed={showHelp}
-            aria-label="Toggle help"
-          >
-            <IconHelp />
-            <span>Help</span>
-          </button>
-        ) : null}
-      </div>
-
       {showHelp && hasResult ? (
         <div className="rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-[0.7rem] text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300">
           <ul className="list-disc space-y-1 pl-4">
@@ -956,43 +929,61 @@ const ResultPanel = ({
           {/* Spacer */}
           <div className="flex-1" />
 
-          {/* More menu for secondary actions */}
-          <div className="relative" ref={moreMenuRef}>
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setShowMoreMenu((prev) => !prev)}
-              className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white p-1.5 text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
-              aria-label="More options"
-              aria-expanded={showMoreMenu}
+              onClick={() => setShowHelp((prev) => !prev)}
+              className={cx(
+                "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200",
+                showHelp
+                  ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
+                  : ""
+              )}
+              aria-pressed={showHelp}
+              aria-label="Toggle help"
+              title="Help"
             >
-              <IconMoreVertical />
+              <IconHelp />
             </button>
-            {showMoreMenu ? (
-              <div className="absolute right-0 top-full z-10 mt-1 min-w-40 rounded-xl border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
-                {hasEdits ? (
+
+            {/* More menu for secondary actions */}
+            <div className="relative" ref={moreMenuRef}>
+              <button
+                type="button"
+                onClick={() => setShowMoreMenu((prev) => !prev)}
+                className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white p-1.5 text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
+                aria-label="More options"
+                aria-expanded={showMoreMenu}
+              >
+                <IconMoreVertical />
+              </button>
+              {showMoreMenu ? (
+                <div className="absolute right-0 top-full z-10 mt-1 min-w-40 rounded-xl border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+                  {hasEdits ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowMoreMenu(false);
+                        openRestoreDialog();
+                      }}
+                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-slate-600 transition hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
+                    >
+                      Restore original
+                    </button>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => {
                       setShowMoreMenu(false);
-                      openRestoreDialog();
+                      onClearSelection();
                     }}
                     className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-slate-600 transition hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
                   >
-                    Restore original
+                    Clear selection
                   </button>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowMoreMenu(false);
-                    onClearSelection();
-                  }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-slate-600 transition hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
-                >
-                  Clear selection
-                </button>
-              </div>
-            ) : null}
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       ) : null}
@@ -1064,6 +1055,11 @@ const ResultPanel = ({
                     )}
                   </button>
                 </div>
+                {dimensionLabel ? (
+                  <span className="tag-pill pointer-events-none absolute left-3 bottom-3">
+                    {dimensionLabel}
+                  </span>
+                ) : null}
                 <div
                   className="preview-canvas relative"
                   style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
