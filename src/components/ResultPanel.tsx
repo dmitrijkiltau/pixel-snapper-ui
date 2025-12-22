@@ -198,6 +198,14 @@ const ResultPanel = ({
   const canUndo = editHistory.index > 0;
   const canRedo =
     editHistory.index >= 0 && editHistory.index < editHistory.entries.length - 1;
+  const getCanvasContext = (canvas: HTMLCanvasElement) => {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      return null;
+    }
+    ctx.imageSmoothingEnabled = false;
+    return ctx;
+  };
 
   const drawImageToCanvas = (image: HTMLImageElement, url: string) => {
     const canvas = canvasRef.current;
@@ -208,7 +216,7 @@ const ResultPanel = ({
     const height = resultHeight ?? image.naturalHeight;
     canvas.width = width;
     canvas.height = height;
-    const ctx = canvas.getContext("2d");
+    const ctx = getCanvasContext(canvas);
     if (!ctx) {
       return;
     }
@@ -292,7 +300,7 @@ const ResultPanel = ({
   const canRestore = hasEdits && Boolean(resultOriginalUrl);
 
   function extractPaletteFromCanvas(canvas: HTMLCanvasElement) {
-    const ctx = canvas.getContext("2d");
+    const ctx = getCanvasContext(canvas);
     if (!ctx) {
       return [];
     }
@@ -348,7 +356,7 @@ const ResultPanel = ({
     if (!canvas) {
       return;
     }
-    const ctx = canvas.getContext("2d");
+    const ctx = getCanvasContext(canvas);
     if (!ctx) {
       return;
     }
@@ -393,7 +401,7 @@ const ResultPanel = ({
     if (!canvas) {
       return;
     }
-    const ctx = canvas.getContext("2d");
+    const ctx = getCanvasContext(canvas);
     if (!ctx) {
       return;
     }
