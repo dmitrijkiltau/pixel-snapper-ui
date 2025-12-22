@@ -453,13 +453,20 @@ const ResultPanel = ({
     applyHistoryEntry(nextUrl);
   };
 
-  const handlePaletteChange = (index: number, color: string) => {
-    setPalette((prev) => {
-      const next = [...prev];
-      next[index] = color;
-      return next;
-    });
-    setBrushColor(color);
+  const copyPaletteColor = async (color: string) => {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(color);
+      return;
+    }
+    const textarea = document.createElement("textarea");
+    textarea.value = color;
+    textarea.setAttribute("readonly", "true");
+    textarea.style.position = "absolute";
+    textarea.style.left = "-9999px";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    textarea.remove();
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -756,7 +763,7 @@ const ResultPanel = ({
                   type="color"
                   value={brushColor}
                   onChange={(event) => setBrushColor(event.target.value)}
-                  className="h-5 w-5 cursor-pointer rounded-full border border-slate-300 p-0 dark:border-slate-600"
+                  className="h-5 w-5 cursor-pointer rounded-full p-0"
                   aria-label="Brush color"
                 />
               </div>
@@ -862,19 +869,44 @@ const ResultPanel = ({
                 <span className="text-[0.55rem] font-semibold uppercase tracking-[0.35em] text-slate-400 dark:text-slate-500">
                   Palette
                 </span>
-                <div className="flex flex-wrap items-center">
-                  {palette.map((color, index) => (
-                    <label key={`${color}-${index}`} className="flex items-center">
-                      <span className="sr-only">Palette color {index + 1}</span>
-                      <input
-                        type="color"
-                        value={color}
-                        onChange={(event) => handlePaletteChange(index, event.target.value)}
-                        className="h-6 w-6 cursor-pointer bg-transparent p-0"
-                        aria-label={`Palette color ${index + 1}`}
+                <div className="flex flex-wrap items-center gap-2">
+                  {palette.map((color, index) => {
+                    if (!isEditing) {
+                      return (
+                        <button
+                          key={`${color}-${index}`}
+                          type="button"
+                          onClick={() => copyPaletteColor(color)}
+                          className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-2 py-1 text-[0.55rem] font-medium text-slate-500 transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100"
+                          aria-label={`Copy palette color ${color}`}
+                          title="Copy hex"
+                        >
+                          <span
+                            className="h-4 w-4 rounded-full border border-slate-200 dark:border-slate-700"
+                            style={{ backgroundColor: color }}
+                          />
+                          <span>{color}</span>
+                        </button>
+                      );
+                    }
+
+                    return (
+                      <button
+                        key={`${color}-${index}`}
+                        type="button"
+                        onClick={() => setBrushColor(color)}
+                        className={cx(
+                          "h-7 w-7 rounded-md border transition",
+                          brushColor.toLowerCase() === color.toLowerCase()
+                            ? "border-slate-900 ring-2 ring-slate-900/20 dark:border-slate-100 dark:ring-slate-100/20"
+                            : "border-slate-300 hover:border-slate-400 dark:border-slate-600 dark:hover:border-slate-400"
+                        )}
+                        style={{ backgroundColor: color }}
+                        aria-label={`Select palette color ${index + 1}`}
+                        title={`Select ${color}`}
                       />
-                    </label>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
               <a
