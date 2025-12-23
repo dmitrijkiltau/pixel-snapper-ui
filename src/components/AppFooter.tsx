@@ -20,6 +20,17 @@ const AppFooter = () => (
 
       <div className="border-l border-border-muted" />
 
+      <a
+        href="https://github.com/dmitrijkiltau/pixel-snapper-ui"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="font-medium hover:text-ink"
+      >
+        Github Repository
+      </a>
+
+      <div className="border-l border-border-muted" />
+
       <div className="flex gap-2 sm:justify-end">
         <a
           href="https://kiltau.com/legal-notice"
