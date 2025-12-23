@@ -34,12 +34,9 @@ const K_COLORS_KEY = "pixel-snapper-k-colors";
 const K_SEED_KEY = "pixel-snapper-k-seed";
 
 const statusClasses: Record<StatusTone, string> = {
-  info:
-    "border-slate-200 bg-white/80 text-slate-600 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300",
-  success:
-    "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/40 dark:bg-emerald-500/15 dark:text-emerald-200",
-  error:
-    "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/40 dark:bg-rose-500/15 dark:text-rose-200",
+  info: "border-border bg-paper/80 text-subtle",
+  success: "border-success/30 bg-success/10 text-success",
+  error: "border-error/30 bg-error/10 text-error",
 };
 
 const progressStates: Record<

@@ -3,24 +3,24 @@ import type { ProgressStepKey, ProgressStepState, ProgressTone } from "./types";
 import { cx, SectionHeader } from "./shared";
 
 const progressStatusClasses: Record<ProgressTone, string> = {
-  info: "text-slate-500 dark:text-slate-400",
-  active: "text-slate-900 dark:text-slate-100",
-  success: "text-emerald-600 dark:text-emerald-400",
-  error: "text-rose-600 dark:text-rose-400",
+  info: "text-muted",
+  active: "text-ink",
+  success: "text-success",
+  error: "text-error",
 };
 
 const stepIconClasses: Record<ProgressStepState, string> = {
-  idle: "border-slate-200 bg-white text-slate-400 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-500",
-  active: "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900 shadow-lg",
-  complete: "border-emerald-500 bg-emerald-500 text-white dark:border-emerald-400 dark:bg-emerald-400 dark:text-slate-900",
-  error: "border-rose-500 bg-rose-500 text-white dark:border-rose-400 dark:bg-rose-400",
+  idle: "border-border bg-surface text-muted",
+  active: "border-ink bg-ink text-paper shadow-lg",
+  complete: "border-success bg-success text-paper",
+  error: "border-error bg-error text-paper",
 };
 
 const stepLabelClasses: Record<ProgressStepState, string> = {
-  idle: "text-slate-400 dark:text-slate-500",
-  active: "text-slate-900 dark:text-slate-100 font-semibold",
-  complete: "text-emerald-600 dark:text-emerald-400",
-  error: "text-rose-600 dark:text-rose-400",
+  idle: "text-muted",
+  active: "text-ink font-semibold",
+  complete: "text-success",
+  error: "text-error",
 };
 
 const progressStepMeta: Array<{

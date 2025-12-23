@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./_fonts.css";
+@import "./_theme.css";
 
 @source "../index.html";
 @source "../src/**/*.{js,jsx,ts,tsx}";
@@ -8,55 +9,35 @@
   :root {
     --font-sans: "Sora", "Avenir Next", "Avenir", "Segoe UI", sans-serif;
     --font-mono: "JetBrains Mono", "Space Mono", "SFMono-Regular", "Menlo", monospace;
-    --ink: #12131a;
-    --paper: #f5f0e6;
-    --grid-color: 15 23 42;
-    --card-border: 226 232 240;
-    --card-bg: 255 255 255;
-    --card-shadow: 15 23 42;
   }
 
   body {
     min-height: 100%;
-    background-color: var(--paper);
-    color: var(--ink);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ink: #f8fafc;
-    --paper: #0b1120;
-    --grid-color: 148 163 184;
-    --card-border: 30 41 59;
-    --card-bg: 15 23 42;
-    --card-shadow: 2 6 23;
-  }
-
-  body {
-    color-scheme: dark;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    color-scheme: light dark;
   }
 }
 
 @layer utilities {
   .pixel-grid {
     background-image:
-      linear-gradient(rgb(var(--grid-color) / 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(var(--grid-color) / 0.08) 1px, transparent 1px);
+      linear-gradient(color-mix(in srgb, var(--color-grid) 8%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in srgb, var(--color-grid) 8%, transparent) 1px, transparent 1px);
     background-size: 16px 16px;
   }
 
   .glass-card {
-    border: 1px solid rgb(var(--card-border) / 0.7);
-    background-color: rgb(var(--card-bg) / 0.75);
-    box-shadow: 0 20px 60px -35px rgb(var(--card-shadow) / 0.65);
+    border: 1px solid color-mix(in srgb, var(--color-border), transparent 30%);
+    background-color: color-mix(in srgb, var(--color-surface), transparent 25%);
+    box-shadow: 0 20px 60px -35px color-mix(in srgb, var(--color-shadow), transparent 35%);
     backdrop-filter: blur(8px);
   }
 
   .panel-card {
-    border: 1px solid rgb(var(--card-border) / 0.7);
-    background-color: rgb(var(--card-bg) / 0.75);
-    box-shadow: 0 20px 60px -35px rgb(var(--card-shadow) / 0.65);
+    border: 1px solid color-mix(in srgb, var(--color-border), transparent 30%);
+    background-color: color-mix(in srgb, var(--color-surface), transparent 25%);
+    box-shadow: 0 20px 60px -35px color-mix(in srgb, var(--color-shadow), transparent 35%);
     backdrop-filter: blur(8px);
     border-radius: 1.5rem;
     padding: 1.5rem;
@@ -67,20 +48,23 @@
     top: 50%;
     transform: translate(-50%, -50%);
     width: min(90vw, 440px);
-    border: 1px solid rgb(var(--card-border) / 0.8);
-    background-color: rgb(var(--card-bg) / 0.95);
-    box-shadow: 0 20px 60px -35px rgb(var(--card-shadow) / 0.65);
+    border: 1px solid color-mix(in srgb, var(--color-border), transparent 20%);
+    background-color: color-mix(in srgb, var(--color-surface), transparent 5%);
+    box-shadow: 0 20px 60px -35px color-mix(in srgb, var(--color-shadow), transparent 35%);
     border-radius: 1.5rem;
     padding: 1.5rem;
   }
 
   .dialog-shell::backdrop {
-    background-color: rgb(15 23 42 / 0.45);
+    background-color: color-mix(in srgb, var(--color-shadow), transparent 55%);
     backdrop-filter: blur(4px);
   }
 
   .tag-pill {
-    @apply rounded-full border border-slate-200 bg-white/70 px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-slate-500 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300;
+    @apply rounded-full px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.35em];
+    border: 1px solid var(--color-border);
+    background-color: color-mix(in srgb, var(--color-paper), transparent 30%);
+    color: var(--color-muted);
   }
 
   .step-pill {
@@ -108,7 +92,10 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-[0_12px_30px_-16px_rgba(15,23,42,0.9)] transition hover:-translate-y-0.5 hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400/60 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white dark:shadow-[0_12px_30px_-16px_rgba(8,15,30,0.9)] dark:focus-visible:ring-slate-200/70;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition hover:-translate-y-0.5 focus-visible:outline-none;
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+    box-shadow: 0 12px 30px -16px color-mix(in srgb, var(--color-shadow), transparent 10%);
   }
 
   [class^="btn-"]:not(:disabled),

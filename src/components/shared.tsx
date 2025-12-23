@@ -23,8 +23,8 @@ export const StepPill = ({ label, tone = "light" }: StepPillProps) => (
     className={cx(
       "step-pill",
       tone === "dark"
-        ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
-        : "bg-white/70 text-slate-500 dark:bg-slate-900/70 dark:text-slate-300"
+        ? "bg-ink text-paper"
+        : "bg-paper/70 text-muted"
     )}
   >
     {label}
