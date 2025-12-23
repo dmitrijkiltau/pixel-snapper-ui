@@ -28,8 +28,26 @@ Guidance for AI agents working on this repo.
 
 ## UI/style notes
 - Tailwind v4 is used via `@import "tailwindcss"` in `src/main.css`.
-- Custom utilities/classes live in `src/main.css`; prefer reusing them before adding new ones.
+- Design tokens are defined in `src/_theme.css` using `@theme` with `light-dark()` color values.
+- Custom utilities/classes live in `src/main.css` using `@apply` directives; prefer reusing them before adding new ones.
 - Fonts are loaded from Google Fonts in `src/main.css`.
+
+### Color tokens
+The app uses a set of design tokens with automatic light/dark mode support via `light-dark()`:
+- **`--color-ink`**: Text and dark backgrounds (light: slate-900, dark: slate-50)
+- **`--color-paper`**: Page background (light: #f5f0e6, dark: #0b1120)
+- **`--color-muted`**: Secondary text (light: slate-500, dark: slate-300)
+- **`--color-subtle`**: Tertiary text (light: slate-600, dark: slate-400)
+- **`--color-border`**: Border colors (light: slate-200, dark: slate-700)
+- **`--color-border-muted`**: Subtle borders (light: slate-300, dark: slate-600)
+- **`--color-surface`**: Card/panel surfaces (light: white, dark: slate-900)
+- **`--color-shadow`**: Shadow colors (light: #0f172a, dark: #020617)
+- **`--color-grid`**: Grid background (light: slate-900, dark: slate-400)
+- **`--color-success`**: Success/positive states (light: emerald-500, dark: emerald-400)
+- **`--color-error`**: Error/negative states (light: rose-500, dark: rose-400)
+- **`--color-accent`**: Interactive elements (light: indigo-500, dark: indigo-400)
+
+Use token classes (e.g., `bg-ink`, `text-muted`, `border-border`) instead of hardcoded color utilities to leverage automatic mode switching.
 
 ## Expectations for changes
 - Keep UI component changes in `src/components/` and app state/logic in `src/App.tsx` unless there is a clear reason otherwise.
