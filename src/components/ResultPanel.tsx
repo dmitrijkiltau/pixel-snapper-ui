@@ -251,6 +251,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
   const restoreDialogRef = useRef<HTMLDialogElement | null>(null);
   const cancelDialogRef = useRef<HTMLDialogElement | null>(null);
   const moreMenuRef = useRef<HTMLDivElement | null>(null);
+  const helpPopupRef = useRef<HTMLDivElement | null>(null);
   const dragState = useRef<DragState | null>(null);
   const paintState = useRef<PaintState | null>(null);
   const touchState = useRef<TouchState | null>(null);
@@ -291,6 +292,17 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showMoreMenu]);
+
+  useEffect(() => {
+    if (!showHelp) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      if (helpPopupRef.current && !helpPopupRef.current.contains(event.target as Node)) {
+        setShowHelp(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showHelp]);
 
   useEffect(() => {
     return () => {
@@ -1038,23 +1050,6 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
         action={<StepPill label="Step 2" />}
       />
 
-      {showHelp && hasResult ? (
-        <div className="rounded-2xl border border-slate-200 bg-white/70 px-4 py-3 text-[0.7rem] text-slate-600 shadow-sm dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300">
-          <ul className="list-disc space-y-1 pl-4">
-            <li>Scroll or pinch to zoom</li>
-            {isEditing ? (
-              <>
-                <li>Two-finger pan or right-click drag</li>
-                <li>One-finger/click to {editTool === "fill" ? "fill" : editTool === "erase" ? "erase" : "paint"}</li>
-                <li>Alt+click to sample color</li>
-              </>
-            ) : (
-              <li>One-finger/drag or right-click to pan</li>
-            )}
-          </ul>
-        </div>
-      ) : null}
-
       {hasResult ? (
         <div className="flex flex-wrap items-center gap-2">
           <div className="flex items-center gap-2">
@@ -1180,21 +1175,39 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
           <div className="flex-1" />
 
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setShowHelp((prev) => !prev)}
-              className={cx(
-                "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200",
-                showHelp
-                  ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
-                  : ""
-              )}
-              aria-pressed={showHelp}
-              aria-label="Toggle help"
-              title="Help"
-            >
-              <IconHelp />
-            </button>
+            <div className="relative" ref={helpPopupRef}>
+              <button
+                type="button"
+                onClick={() => setShowHelp((prev) => !prev)}
+                className={cx(
+                  "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200",
+                  showHelp
+                    ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
+                    : ""
+                )}
+                aria-pressed={showHelp}
+                aria-label="Toggle help"
+                title="Help"
+              >
+                <IconHelp />
+              </button>
+              {showHelp && hasResult ? (
+                <div className="pointer-events-auto absolute right-0 top-full z-20 mt-1 min-w-[16rem] rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-[0.7rem] text-slate-600 shadow-lg dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300">
+                  <ul className="list-disc space-y-1 pl-4">
+                    <li>Scroll or pinch to zoom</li>
+                    {isEditing ? (
+                      <>
+                        <li>Two-finger pan or right-click drag</li>
+                        <li>One-finger/click to {editTool === "fill" ? "fill" : editTool === "erase" ? "erase" : "paint"}</li>
+                        <li>Alt+click to sample color</li>
+                      </>
+                    ) : (
+                      <li>One-finger/drag or right-click to pan</li>
+                    )}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
 
             {/* More menu for secondary actions */}
             <div className="relative" ref={moreMenuRef}>
