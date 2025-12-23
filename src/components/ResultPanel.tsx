@@ -1389,7 +1389,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                           </button>
                         );
                       })}
-                      {paletteOthersWidth > 0 && (
+                      {paletteOthersWidth > 0 && !isEditing && (
                         <div
                           aria-hidden="true"
                           className="pointer-events-none h-full bg-linear-to from-white/60 to-white/0 dark:from-slate-900/80 dark:to-slate-900/20"
