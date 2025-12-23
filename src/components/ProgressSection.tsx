@@ -139,7 +139,7 @@ type ProgressSectionProps = {
 
 const ProgressSection = ({ steps }: ProgressSectionProps) => {
   return (
-    <section className="sticky top-0 z-20 panel-card mt-0 rounded-t-none border-t-0 pt-0 reveal" style={{ animationDelay: "140ms" }}>
+    <section className="sticky top-6 z-20 panel-card mt-0 rounded-t-none border-t-0 pt-0 reveal" style={{ animationDelay: "140ms" }}>
       {/* Sticky step indicators */}
       <div className="flex items-start justify-between gap-1 px-1 py-4">
         {progressStepMeta.map((step, index) => {

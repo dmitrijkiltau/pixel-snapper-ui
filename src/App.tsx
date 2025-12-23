@@ -665,9 +665,9 @@ const App = () => {
     : "";
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,171,102,0.55),transparent_55%),radial-gradient(circle_at_80%_25%,rgba(88,150,255,0.45),transparent_50%),radial-gradient(circle_at_10%_90%,rgba(237,91,133,0.35),transparent_40%)] dark:bg-[radial-gradient(circle_at_top,rgba(30,41,59,0.95),transparent_60%),radial-gradient(circle_at_80%_25%,rgba(56,189,248,0.2),transparent_55%),radial-gradient(circle_at_10%_90%,rgba(248,113,113,0.16),transparent_45%)]"></div>
-      <div className="pointer-events-none absolute inset-0 opacity-40 pixel-grid"></div>
+    <div className="min-h-screen">
+      <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(255,171,102,0.55),transparent_55%),radial-gradient(circle_at_80%_25%,rgba(88,150,255,0.45),transparent_50%),radial-gradient(circle_at_10%_90%,rgba(237,91,133,0.35),transparent_40%)] dark:bg-[radial-gradient(circle_at_top,rgba(30,41,59,0.95),transparent_60%),radial-gradient(circle_at_80%_25%,rgba(56,189,248,0.2),transparent_55%),radial-gradient(circle_at_10%_90%,rgba(248,113,113,0.16),transparent_45%)]"></div>
+      <div className="pointer-events-none fixed inset-0 opacity-40 pixel-grid"></div>
 
       <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-6 pb-16 pt-12">
         <HeroHeader />
