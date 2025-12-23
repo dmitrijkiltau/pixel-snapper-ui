@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@import "./_fonts.css";
+
+@source "../index.html";
+@source "../src/**/*.{js,jsx,ts,tsx}";
 
 /* Tailwind v4 theme tokens using light/dark color values */
 @theme {
@@ -19,4 +23,7 @@
   --color-success: light-dark(var(--color-emerald-500), var(--color-emerald-400));
   --color-error: light-dark(var(--color-rose-500), var(--color-rose-400));
   --color-accent: light-dark(var(--color-indigo-500), var(--color-indigo-400));
+
+  --font-sans: "Sora", "Avenir Next", "Avenir", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Space Mono", "SFMono-Regular", "Menlo", monospace;
 }

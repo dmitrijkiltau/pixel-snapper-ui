@@ -1,14 +1,7 @@
-@import "tailwindcss";
-@import "./_fonts.css";
 @import "./_theme.css";
-
-@source "../index.html";
-@source "../src/**/*.{js,jsx,ts,tsx}";
 
 @layer base {
   :root {
-    --font-sans: "Sora", "Avenir Next", "Avenir", "Segoe UI", sans-serif;
-    --font-mono: "JetBrains Mono", "Space Mono", "SFMono-Regular", "Menlo", monospace;
   }
 
   body {
