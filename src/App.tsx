@@ -574,8 +574,8 @@ const App = () => {
 
   const resultDimensions =
     activeResult &&
-    typeof activeResult.width === "number" &&
-    typeof activeResult.height === "number"
+      typeof activeResult.width === "number" &&
+      typeof activeResult.height === "number"
       ? { width: activeResult.width, height: activeResult.height }
       : null;
 
@@ -591,10 +591,10 @@ const App = () => {
       prev.map((item) =>
         item.id === activeHistoryId
           ? {
-              ...item,
-              dataUrl,
-              originalDataUrl: item.originalDataUrl ?? item.dataUrl,
-            }
+            ...item,
+            dataUrl,
+            originalDataUrl: item.originalDataUrl ?? item.dataUrl,
+          }
           : item
       )
     );
@@ -672,11 +672,7 @@ const App = () => {
       <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col gap-10 px-6 pb-16 pt-12">
         <HeroHeader />
 
-        <ProgressSection
-          label={progressLabel}
-          tone={progressTone}
-          steps={progressSteps}
-        />
+        <ProgressSection steps={progressSteps} />
 
         <section className="grid items-start gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <UploadForm
@@ -694,22 +690,22 @@ const App = () => {
             onEditInput={handleEditInput}
           />
 
-        <ResultPanel
-          ref={resultPanelRef}
-          resultId={activeResult?.id ?? null}
-          resultUrl={activeResult?.dataUrl ?? null}
-          resultOriginalUrl={activeResult?.originalDataUrl ?? null}
-          resultDownloadName={activeResult?.downloadName ?? "snapped.png"}
-          resultDimensions={resultDimensions}
-          hasEdits={hasEdits}
-          onCommitEdits={handleCommitEdits}
-          onDiscardEdits={handleDiscardEdits}
-          showGrid={showPreviewGrid}
-          previewBackground={previewBackground}
-          onToggleGrid={togglePreviewGrid}
-          onTogglePreviewBackground={togglePreviewBackground}
-          onClearSelection={handleClearSelection}
-        />
+          <ResultPanel
+            ref={resultPanelRef}
+            resultId={activeResult?.id ?? null}
+            resultUrl={activeResult?.dataUrl ?? null}
+            resultOriginalUrl={activeResult?.originalDataUrl ?? null}
+            resultDownloadName={activeResult?.downloadName ?? "snapped.png"}
+            resultDimensions={resultDimensions}
+            hasEdits={hasEdits}
+            onCommitEdits={handleCommitEdits}
+            onDiscardEdits={handleDiscardEdits}
+            showGrid={showPreviewGrid}
+            previewBackground={previewBackground}
+            onToggleGrid={togglePreviewGrid}
+            onTogglePreviewBackground={togglePreviewBackground}
+            onClearSelection={handleClearSelection}
+          />
         </section>
 
         <HistorySection

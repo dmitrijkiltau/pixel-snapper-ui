@@ -1,13 +1,6 @@
 import { type ReactNode } from "react";
-import type { ProgressStepKey, ProgressStepState, ProgressTone } from "./types";
-import { cx, SectionHeader } from "./shared";
-
-const progressStatusClasses: Record<ProgressTone, string> = {
-  info: "text-muted",
-  active: "text-ink",
-  success: "text-success",
-  error: "text-error",
-};
+import type { ProgressStepKey, ProgressStepState } from "./types";
+import { cx } from "./shared";
 
 const stepIconClasses: Record<ProgressStepState, string> = {
   idle: "border-border bg-surface text-muted",
@@ -29,63 +22,63 @@ const progressStepMeta: Array<{
   icon: ReactNode;
   completeIcon: ReactNode;
 }> = [
-  {
-    key: "upload",
-    label: "Upload",
-    icon: (
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-        <path d="M12 16V6M8 10l4-4 4 4" />
-      </svg>
-    ),
-    completeIcon: (
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-        <path d="M5 12l5 5L20 7" />
-      </svg>
-    ),
-  },
-  {
-    key: "queue",
-    label: "Queue",
-    icon: (
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-        <path d="M4 7h16M4 12h10M4 17h6" />
-      </svg>
-    ),
-    completeIcon: (
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-        <path d="M5 12l5 5L20 7" />
-      </svg>
-    ),
-  },
-  {
-    key: "snap",
-    label: "Snap",
-    icon: (
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-        <rect x="5" y="5" width="5" height="5" /><rect x="14" y="5" width="5" height="5" /><rect x="5" y="14" width="5" height="5" /><rect x="14" y="14" width="5" height="5" />
-      </svg>
-    ),
-    completeIcon: (
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-        <path d="M5 12l5 5L20 7" />
-      </svg>
-    ),
-  },
-  {
-    key: "ready",
-    label: "Ready",
-    icon: (
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-        <path d="M5 12l5 5L20 7" />
-      </svg>
-    ),
-    completeIcon: (
-      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-        <path d="M5 12l5 5L20 7" />
-      </svg>
-    ),
-  },
-];
+    {
+      key: "upload",
+      label: "Upload",
+      icon: (
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+          <path d="M12 16V6M8 10l4-4 4 4" />
+        </svg>
+      ),
+      completeIcon: (
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+          <path d="M5 12l5 5L20 7" />
+        </svg>
+      ),
+    },
+    {
+      key: "queue",
+      label: "Queue",
+      icon: (
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+          <path d="M4 7h16M4 12h10M4 17h6" />
+        </svg>
+      ),
+      completeIcon: (
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+          <path d="M5 12l5 5L20 7" />
+        </svg>
+      ),
+    },
+    {
+      key: "snap",
+      label: "Snap",
+      icon: (
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+          <rect x="5" y="5" width="5" height="5" /><rect x="14" y="5" width="5" height="5" /><rect x="5" y="14" width="5" height="5" /><rect x="14" y="14" width="5" height="5" />
+        </svg>
+      ),
+      completeIcon: (
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+          <path d="M5 12l5 5L20 7" />
+        </svg>
+      ),
+    },
+    {
+      key: "ready",
+      label: "Ready",
+      icon: (
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+          <path d="M5 12l5 5L20 7" />
+        </svg>
+      ),
+      completeIcon: (
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+          <path d="M5 12l5 5L20 7" />
+        </svg>
+      ),
+    },
+  ];
 
 type ProgressStepProps = {
   step: typeof progressStepMeta[number];
@@ -100,7 +93,7 @@ const ProgressStep = ({ step, state, isLast, nextState }: ProgressStepProps) => 
   const showIcon = isComplete ? step.completeIcon : step.icon;
 
   return (
-    <div className="flex flex-1 items-center">
+    <div className={cx("flex items-center", !isLast && "flex-1")}>
       <div className="flex flex-col items-center gap-2">
         <div
           className={cx(
@@ -141,50 +134,29 @@ const ProgressStep = ({ step, state, isLast, nextState }: ProgressStepProps) => 
 };
 
 type ProgressSectionProps = {
-  label: string;
-  tone: ProgressTone;
   steps: Record<ProgressStepKey, ProgressStepState>;
 };
 
-const ProgressSection = ({ label, tone, steps }: ProgressSectionProps) => {
+const ProgressSection = ({ steps }: ProgressSectionProps) => {
   return (
-    <section className="reveal" style={{ animationDelay: "140ms" }}>
-      {/* Non-sticky title row */}
-      <div className="panel-card mb-0 rounded-b-none border-b-0 pb-0">
-        <SectionHeader
-          title="Progress"
-          action={
-            <span
-              id="progress-status"
-              className={cx("text-sm font-medium", progressStatusClasses[tone])}
-              aria-live="polite"
-            >
-              {label}
-            </span>
-          }
-        />
-      </div>
-
+    <section className="sticky top-0 z-20 panel-card mt-0 rounded-t-none border-t-0 pt-0 reveal" style={{ animationDelay: "140ms" }}>
       {/* Sticky step indicators */}
-      <div className="sticky top-0 z-20 panel-card mt-0 rounded-t-none border-t-0 pt-0">
-        <div className="flex items-start justify-between gap-1 px-1 py-4">
-          <div className="flex-1 -m-8"/>
-          {progressStepMeta.map((step, index) => {
-            const state = steps[step.key];
-            const nextStep = progressStepMeta[index + 1];
-            const nextState = nextStep ? steps[nextStep.key] : undefined;
+      <div className="flex items-start justify-between gap-1 px-1 py-4">
+        {progressStepMeta.map((step, index) => {
+          const state = steps[step.key];
+          const nextStep = progressStepMeta[index + 1];
+          const nextState = nextStep ? steps[nextStep.key] : undefined;
 
-            return (
-              <ProgressStep
-                key={step.key}
-                step={step}
-                state={state}
-                isLast={index === progressStepMeta.length - 1}
-                nextState={nextState}
-              />
-            );
-          })}
-        </div>
+          return (
+            <ProgressStep
+              key={step.key}
+              step={step}
+              state={state}
+              isLast={index === progressStepMeta.length - 1}
+              nextState={nextState}
+            />
+          );
+        })}
       </div>
     </section>
   );
