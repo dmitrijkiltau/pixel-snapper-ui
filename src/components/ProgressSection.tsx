@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import type { ProgressStepKey, ProgressStepState } from "./types";
 import { cx } from "./shared";
 
@@ -110,7 +110,10 @@ const ProgressStep = ({ step, state, isLast, nextState }: ProgressStepProps) => 
             />
           )}
         </div>
-        <span className={cx("text-xs transition-colors duration-300", stepLabelClasses[state])}>
+        <span className={cx(
+          "text-xs transition-colors duration-300",
+          stepLabelClasses[state],
+        )}>
           {step.label}
         </span>
       </div>
@@ -138,27 +141,58 @@ type ProgressSectionProps = {
 };
 
 const ProgressSection = ({ steps }: ProgressSectionProps) => {
-  return (
-    <section className="sticky top-6 z-20 panel-card mt-0 rounded-t-none border-t-0 pt-0 reveal" style={{ animationDelay: "140ms" }}>
-      {/* Sticky step indicators */}
-      <div className="flex items-start justify-between gap-1 px-1 py-4">
-        {progressStepMeta.map((step, index) => {
-          const state = steps[step.key];
-          const nextStep = progressStepMeta[index + 1];
-          const nextState = nextStep ? steps[nextStep.key] : undefined;
+  const [isStuck, setIsStuck] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
-          return (
-            <ProgressStep
-              key={step.key}
-              step={step}
-              state={state}
-              isLast={index === progressStepMeta.length - 1}
-              nextState={nextState}
-            />
-          );
-        })}
-      </div>
-    </section>
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsStuck(!entry.isIntersecting);
+      },
+      { threshold: 1 }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <>
+      {/* Sentinel element to detect when sticky element becomes stuck */}
+      <div ref={sentinelRef} className="h-px -mb-px" aria-hidden="true" />
+      
+      <section 
+        ref={sectionRef}
+        className="sticky top-6 z-20 panel-card mt-0 rounded-t-none border-t-0 pt-0 reveal" 
+        style={{ animationDelay: "140ms" }}
+      >
+        {/* Sticky step indicators */}
+        <div className={cx(
+          "flex items-start justify-between gap-1 px-1 transition-all duration-300",
+          isStuck ? "py-0" : "py-4"
+        )}>
+          {progressStepMeta.map((step, index) => {
+            const state = steps[step.key];
+            const nextStep = progressStepMeta[index + 1];
+            const nextState = nextStep ? steps[nextStep.key] : undefined;
+
+            return (
+              <ProgressStep
+                key={step.key}
+                step={step}
+                state={state}
+                isLast={index === progressStepMeta.length - 1}
+                nextState={nextState}
+              />
+            );
+          })}
+        </div>
+      </section>
+    </>
   );
 };
 
