@@ -30,6 +30,8 @@ const HISTORY_LIMIT = 12;
 const STATUS_TIMEOUT_MS = 4000;
 const PREVIEW_BACKGROUND_KEY = "pixel-snapper-preview-background";
 const PREVIEW_GRID_KEY = "pixel-snapper-preview-grid";
+const K_COLORS_KEY = "pixel-snapper-k-colors";
+const K_SEED_KEY = "pixel-snapper-k-seed";
 
 const statusClasses: Record<StatusTone, string> = {
   info:
@@ -154,6 +156,21 @@ const loadGridPreference = () => {
   }
 };
 
+const loadTextPreference = (key: string, fallback: string) => {
+  if (typeof window === "undefined") {
+    return fallback;
+  }
+  try {
+    const stored = localStorage.getItem(key);
+    return stored ?? fallback;
+  } catch {
+    return fallback;
+  }
+};
+
+const loadKColorsPreference = () => loadTextPreference(K_COLORS_KEY, "16");
+const loadKSeedPreference = () => loadTextPreference(K_SEED_KEY, "0");
+
 const blobToDataUrl = (blob: Blob) =>
   new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
@@ -243,8 +260,8 @@ const App = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [activeHistoryId, setActiveHistoryId] = useState<string | null>(null);
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
-  const [kColorsValue, setKColorsValue] = useState("16");
-  const [kSeedValue, setKSeedValue] = useState("0");
+  const [kColorsValue, setKColorsValue] = useState(() => loadKColorsPreference());
+  const [kSeedValue, setKSeedValue] = useState(() => loadKSeedPreference());
   const [previewBackground, setPreviewBackground] = useState<PreviewBackgroundOption>(
     () => loadPreviewBackgroundPreference()
   );
@@ -325,6 +342,28 @@ const App = () => {
       // Ignore storage errors.
     }
   }, [showPreviewGrid]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    try {
+      localStorage.setItem(K_COLORS_KEY, kColorsValue);
+    } catch {
+      // Ignore storage errors.
+    }
+  }, [kColorsValue]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+    try {
+      localStorage.setItem(K_SEED_KEY, kSeedValue);
+    } catch {
+      // Ignore storage errors.
+    }
+  }, [kSeedValue]);
 
   useEffect(() => {
     return () => {
