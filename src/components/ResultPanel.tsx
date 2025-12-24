@@ -593,7 +593,11 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
     ) {
       return false;
     }
+    
+    const visited = new Set<number>();
     const stack: Array<{ x: number; y: number }> = [point];
+    visited.add(point.y * width + point.x);
+    
     while (stack.length) {
       const current = stack.pop();
       if (!current) {
@@ -612,17 +616,34 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
       data[idx + 1] = fill.g;
       data[idx + 2] = fill.b;
       data[idx + 3] = fill.a;
+      
       if (current.x > 0) {
-        stack.push({ x: current.x - 1, y: current.y });
+        const nextIdx = current.y * width + (current.x - 1);
+        if (!visited.has(nextIdx)) {
+          visited.add(nextIdx);
+          stack.push({ x: current.x - 1, y: current.y });
+        }
       }
       if (current.x < width - 1) {
-        stack.push({ x: current.x + 1, y: current.y });
+        const nextIdx = current.y * width + (current.x + 1);
+        if (!visited.has(nextIdx)) {
+          visited.add(nextIdx);
+          stack.push({ x: current.x + 1, y: current.y });
+        }
       }
       if (current.y > 0) {
-        stack.push({ x: current.x, y: current.y - 1 });
+        const nextIdx = (current.y - 1) * width + current.x;
+        if (!visited.has(nextIdx)) {
+          visited.add(nextIdx);
+          stack.push({ x: current.x, y: current.y - 1 });
+        }
       }
       if (current.y < height - 1) {
-        stack.push({ x: current.x, y: current.y + 1 });
+        const nextIdx = (current.y + 1) * width + current.x;
+        if (!visited.has(nextIdx)) {
+          visited.add(nextIdx);
+          stack.push({ x: current.x, y: current.y + 1 });
+        }
       }
     }
     ctx.putImageData(image, 0, 0);

@@ -93,11 +93,11 @@ const ProgressStep = ({ step, state, isLast, nextState }: ProgressStepProps) => 
   const showIcon = isComplete ? step.completeIcon : step.icon;
 
   return (
-    <div className={cx("flex items-center", !isLast && "flex-1")}>
-      <div className="flex flex-col items-center gap-2">
+    <div className={cx("flex flex-col", !isLast && "flex-1")}>
+      <div className="flex w-full items-center">
         <div
           className={cx(
-            "relative flex h-9 w-9 items-center justify-center rounded-full border-2 transition-all duration-300",
+            "relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300",
             stepIconClasses[state],
             isActive && "motion-safe:animate-pulse"
           )}
@@ -110,28 +110,28 @@ const ProgressStep = ({ step, state, isLast, nextState }: ProgressStepProps) => 
             />
           )}
         </div>
+
+        {!isLast && (
+          <div className="relative mx-2 h-0.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
+            <div
+              className={cx(
+                "absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out",
+                state === "complete" || nextState === "active" || nextState === "complete"
+                  ? "w-full bg-emerald-500 dark:bg-emerald-400"
+                  : "w-0 bg-slate-400"
+              )}
+            />
+          </div>
+        )}
+      </div>
+      <div className="mt-2 flex w-9 justify-center">
         <span className={cx(
-          "text-xs transition-colors duration-300",
+          "text-xs transition-colors duration-300 whitespace-nowrap",
           stepLabelClasses[state],
         )}>
           {step.label}
         </span>
       </div>
-
-      {!isLast && (
-        <div className="relative mx-2 h-0.5 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
-          <div
-            className={cx(
-              "absolute inset-y-0 left-0 rounded-full transition-all duration-500 ease-out",
-              state === "complete" || nextState === "active" || nextState === "complete"
-                ? "w-full bg-emerald-500 dark:bg-emerald-400"
-                : state === "active"
-                  ? "w-1/2 bg-slate-900 dark:bg-slate-100"
-                  : "w-0 bg-slate-400"
-            )}
-          />
-        </div>
-      )}
     </div>
   );
 };
@@ -163,13 +163,13 @@ const ProgressSection = ({ steps }: ProgressSectionProps) => {
   return (
     <>
       {/* Sentinel element to detect when sticky element becomes stuck */}
-      <div ref={sentinelRef} className="h-px -mb-px" aria-hidden="true" />
+      <div ref={sentinelRef} className="h-px -mb-px -mt-10" aria-hidden="true" />
       
       <section 
         ref={sectionRef}
         className={cx(
-          "sticky top-6 z-20 panel-card transition-all duration-300 reveal",
-          isStuck ? "rounded-t-none border-t-0 pt-0 shadow-xl" : ""
+          "sticky top-0 z-20 panel-card transition-all duration-300 reveal",
+          isStuck && "rounded-t-none border-x-0 border-t-0 pt-2 pb-3 shadow-xl bg-surface/95 backdrop-blur-md"
         )}
         style={{ animationDelay: "140ms" }}
       >
