@@ -167,7 +167,10 @@ const ProgressSection = ({ steps }: ProgressSectionProps) => {
       
       <section 
         ref={sectionRef}
-        className="sticky top-6 z-20 panel-card mt-0 rounded-t-none border-t-0 pt-0 reveal" 
+        className={cx(
+          "sticky top-6 z-20 panel-card transition-all duration-300 reveal",
+          isStuck ? "rounded-t-none border-t-0 pt-0 shadow-xl" : ""
+        )}
         style={{ animationDelay: "140ms" }}
       >
         {/* Sticky step indicators */}

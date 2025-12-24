@@ -473,8 +473,8 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
       }));
   }
 
-  function refreshPaletteFromCanvas() {
-    if (isEditing) {
+  function refreshPaletteFromCanvas(force = false) {
+    if (isEditing && !force) {
       return;
     }
     const canvas = canvasRef.current;
@@ -642,7 +642,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
     onCommitEdits(dataUrl);
     dispatchEditHistory({ type: "push", dataUrl });
     setHasPendingEdits(false);
-    refreshPaletteFromCanvas();
+    refreshPaletteFromCanvas(true);
   };
 
   const applyHistoryEntry = (dataUrl: string) => {
@@ -754,33 +754,32 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
       }
       
       const point = getCanvasPoint(event);
-      if (!point) {
-        return;
-      }
-      event.preventDefault();
-      if (event.altKey) {
-        pickColor(point);
-        return;
-      }
-      if (editTool === "fill") {
-        const didFill = fillAtPoint(point);
-        if (didFill) {
-          setHasEditedInSession(true);
-          commitEdits({ force: true });
+      if (point) {
+        event.preventDefault();
+        if (event.altKey) {
+          pickColor(point);
+          return;
         }
+        if (editTool === "fill") {
+          const didFill = fillAtPoint(point);
+          if (didFill) {
+            setHasEditedInSession(true);
+            commitEdits({ force: true });
+          }
+          return;
+        }
+        event.currentTarget.setPointerCapture(event.pointerId);
+        paintState.current = {
+          pointerId: event.pointerId,
+          lastX: point.x,
+          lastY: point.y,
+        };
+        setIsPainting(true);
+        setHasPendingEdits(true);
+        setHasEditedInSession(true);
+        drawPixel(point.x, point.y);
         return;
       }
-      event.currentTarget.setPointerCapture(event.pointerId);
-      paintState.current = {
-        pointerId: event.pointerId,
-        lastX: point.x,
-        lastY: point.y,
-      };
-      setIsPainting(true);
-      setHasPendingEdits(true);
-      setHasEditedInSession(true);
-      drawPixel(point.x, point.y);
-      return;
     }
 
     // In preview mode, one finger pans
@@ -990,20 +989,10 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
   };
 
   const handleDiscard = () => {
-    // If we have saved edits in this session (history has more than the initial entry)
-    const hasSavedEdits = editHistory.entries.length > 1 || 
-                          (editHistory.entries.length === 1 && editHistory.entries[0] !== resultUrl);
-    
-    if (hasSavedEdits && hasPendingEdits) {
-      // Reload the last saved state from history to discard only pending changes
-      const lastSavedUrl = editHistory.entries[editHistory.index];
-      if (lastSavedUrl && lastSavedUrl !== lastLoadedUrlRef.current) {
-        loadImageFromUrl(lastSavedUrl);
-        onCommitEdits(lastSavedUrl);
-      }
-    } else {
-      // No saved edits, discard everything and restore original
-      onDiscardEdits();
+    const initialUrl = editHistory.entries[0];
+    if (initialUrl && initialUrl !== lastLoadedUrlRef.current) {
+      loadImageFromUrl(initialUrl);
+      onCommitEdits(initialUrl);
     }
     
     setHasPendingEdits(false);
