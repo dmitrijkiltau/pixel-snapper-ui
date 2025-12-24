@@ -239,6 +239,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
   const paletteFeedbackTimeoutRef = useRef<number | null>(null);
   const [isPainting, setIsPainting] = useState(false);
   const [hasPendingEdits, setHasPendingEdits] = useState(false);
+  const [hasEditedInSession, setHasEditedInSession] = useState(false);
   const [imageSize, setImageSize] = useState<{ width: number; height: number } | null>(
     null
   );
@@ -267,6 +268,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
     setIsEditing(false);
     setIsPainting(false);
     setHasPendingEdits(false);
+    setHasEditedInSession(false);
     setPalette(
       Array.from({ length: PALETTE_SIZE }, () => ({ color: "#0f172a", percentage: 0 }))
     );
@@ -755,6 +757,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
       if (editTool === "fill") {
         const didFill = fillAtPoint(point);
         if (didFill) {
+          setHasEditedInSession(true);
           commitEdits({ force: true });
         }
         return;
@@ -767,6 +770,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
       };
       setIsPainting(true);
       setHasPendingEdits(true);
+      setHasEditedInSession(true);
       drawPixel(point.x, point.y);
       return;
     }
@@ -974,16 +978,33 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
     }
     commitEdits();
     setIsEditing(false);
+    setHasEditedInSession(false);
   };
 
   const handleDiscard = () => {
+    // If we have saved edits in this session (history has more than the initial entry)
+    const hasSavedEdits = editHistory.entries.length > 1 || 
+                          (editHistory.entries.length === 1 && editHistory.entries[0] !== resultUrl);
+    
+    if (hasSavedEdits && hasPendingEdits) {
+      // Reload the last saved state from history to discard only pending changes
+      const lastSavedUrl = editHistory.entries[editHistory.index];
+      if (lastSavedUrl && lastSavedUrl !== lastLoadedUrlRef.current) {
+        loadImageFromUrl(lastSavedUrl);
+        onCommitEdits(lastSavedUrl);
+      }
+    } else {
+      // No saved edits, discard everything and restore original
+      onDiscardEdits();
+    }
+    
     setHasPendingEdits(false);
+    setHasEditedInSession(false);
     setIsEditing(false);
-    onDiscardEdits();
   };
 
   const openCancelDialog = () => {
-    if (!hasPendingEdits) {
+    if (!hasPendingEdits && !hasEditedInSession) {
       handleDiscard();
       return;
     }
@@ -1023,7 +1044,10 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
   };
 
   const handleRestoreConfirm = () => {
-    handleDiscard();
+    setHasPendingEdits(false);
+    setHasEditedInSession(false);
+    setIsEditing(false);
+    onDiscardEdits();
     closeRestoreDialog();
   };
 
