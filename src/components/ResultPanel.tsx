@@ -421,19 +421,25 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
   const canRestore = hasEdits && Boolean(resultOriginalUrl);
   const previewBackgroundColor =
     previewBackground === "dark" ? "rgba(15, 23, 42, 0.9)" : "rgba(255, 255, 255, 0.85)";
-  const paletteSegments = palette.map((entry) => {
-    const usageWidth = clamp(entry.percentage, 0, 100);
-    return {
+  
+  // Filter out entries with zero percentage and normalize to fill 100%
+  const paletteSegments = palette
+    .filter((entry) => entry.percentage > 0)
+    .map((entry) => ({
       color: entry.color,
       percentage: entry.percentage,
-      usageWidth,
-    };
-  });
+    }));
+  
   const paletteTotalUsage = paletteSegments.reduce(
-    (acc, entry) => acc + entry.usageWidth,
+    (acc, entry) => acc + entry.percentage,
     0
   );
-  const paletteOthersWidth = clamp(100 - paletteTotalUsage, 0, 100);
+  
+  // Normalize widths to fill 100% of the bar
+  const normalizedSegments = paletteSegments.map((entry) => ({
+    ...entry,
+    usageWidth: paletteTotalUsage > 0 ? (entry.percentage / paletteTotalUsage) * 100 : 0,
+  }));
 
   function extractPaletteFromCanvas(canvas: HTMLCanvasElement): PaletteEntry[] {
     const ctx = getCanvasContext(canvas);
@@ -449,9 +455,11 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
     let total = 0;
     for (let i = 0; i < data.length; i += 4) {
       const alpha = data[i + 3];
+      // Skip fully transparent pixels
       if (alpha === 0) {
         continue;
       }
+      // Extract RGB values only, ignoring alpha for color identity
       const hex = `#${toHex(data[i])}${toHex(data[i + 1])}${toHex(data[i + 2])}`;
       counts.set(hex, (counts.get(hex) ?? 0) + 1);
       total += 1;
@@ -1373,10 +1381,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                 <div className="flex flex-col gap-2 px-1 pb-1">
                   <div className="relative flex h-12 overflow-visible rounded-2xl border border-slate-200/80 bg-slate-100/80 shadow-inner dark:border-slate-700/80 dark:bg-slate-950">
                     <div className="flex h-full w-full">
-                      {paletteSegments.map((segment, index) => {
-                        if (segment.usageWidth <= 0) {
-                          return null;
-                        }
+                      {normalizedSegments.map((segment, index) => {
                         const usageLabel = formatPercentage(segment.percentage);
                         const feedbackMatch = paletteFeedback?.color === segment.color;
                         const actionLabel = isEditing ? "Set brush color" : "Copy palette color";
@@ -1385,7 +1390,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                             key={`${segment.color}-${index}`}
                             type="button"
                             onClick={() => handlePaletteSegmentAction(segment.color)}
-                            className="group relative h-full border-0 p-0 text-transparent transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500 first:rounded-l-2xl"
+                            className="group relative h-full border-0 p-0 text-transparent transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500 first:rounded-l-2xl last:rounded-r-2xl"
                             style={{
                               width: `${segment.usageWidth}%`,
                               backgroundColor: segment.color,
@@ -1413,13 +1418,6 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                           </button>
                         );
                       })}
-                      {paletteOthersWidth > 0 && !isEditing && (
-                        <div
-                          aria-hidden="true"
-                          className="pointer-events-none h-full bg-linear-to from-white/60 to-white/0 dark:from-slate-900/80 dark:to-slate-900/20"
-                          style={{ width: `${paletteOthersWidth}%` }}
-                        />
-                      )}
                     </div>
                   </div>
                 </div>
