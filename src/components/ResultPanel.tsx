@@ -1245,7 +1245,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                 <IconMoreVertical />
               </button>
               {showMoreMenu ? (
-                <div className="absolute right-0 top-full z-20 mt-1 min-w-40 rounded-xl border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800">
+                <div className="dropdown-menu">
                   {hasEdits ? (
                     <button
                       type="button"
@@ -1253,7 +1253,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                         setShowMoreMenu(false);
                         openRestoreDialog();
                       }}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-slate-600 transition hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
+                      className="dropdown-item"
                     >
                       Restore original
                     </button>
@@ -1264,7 +1264,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                       setShowMoreMenu(false);
                       onClearSelection();
                     }}
-                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-slate-600 transition hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700"
+                    className="dropdown-item"
                   >
                     Clear selection
                   </button>
@@ -1308,10 +1308,10 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                     onPointerDown={(event) => event.stopPropagation()}
                     onPointerUp={(event) => event.stopPropagation()}
                     className={cx(
-                      "pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-full border text-slate-500 shadow-sm transition hover:text-slate-700",
+                      "pointer-events-auto btn-icon-sm rounded-full transition hover:text-slate-700",
                       showGrid
                         ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
-                        : "border-slate-200 bg-white/80 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300"
+                        : ""
                     )}
                     aria-pressed={showGrid}
                     aria-label="Toggle grid"
@@ -1325,7 +1325,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                     onClick={onTogglePreviewBackground}
                     onPointerDown={(event) => event.stopPropagation()}
                     onPointerUp={(event) => event.stopPropagation()}
-                    className="pointer-events-auto inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 bg-white/80 text-slate-500 shadow-sm transition hover:text-slate-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300 dark:hover:text-slate-100"
+                    className="pointer-events-auto btn-icon-sm rounded-full transition hover:text-slate-700 dark:hover:text-slate-100"
                     aria-label="Toggle preview background"
                   >
                     {previewBackground === "light" ? (

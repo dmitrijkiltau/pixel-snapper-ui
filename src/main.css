@@ -90,6 +90,70 @@
     @apply cursor-not-allowed opacity-60 hover:translate-y-0;
   }
 
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/80 px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:text-slate-900 disabled:cursor-not-allowed disabled:border-slate-200/70 disabled:bg-white/50 disabled:text-slate-400 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-slate-100 dark:disabled:border-slate-700/70 dark:disabled:bg-slate-900/50 dark:disabled:text-slate-500;
+  }
+
+  .btn-icon {
+    @apply inline-flex items-center justify-center rounded-full shadow-sm transition hover:scale-110;
+  }
+
+  .btn-icon-default {
+    @apply h-10 w-10 bg-white/90 text-slate-700 hover:bg-white dark:bg-slate-800 dark:text-slate-300;
+  }
+
+  .btn-icon-danger {
+    @apply h-10 w-10 bg-rose-500/90 text-white hover:bg-rose-500;
+  }
+
+  .btn-icon-sm {
+    @apply h-8 w-8 border border-slate-200 bg-white/80 text-slate-500 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-300;
+  }
+
+  .input-field {
+    @apply rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-slate-200 dark:focus:ring-slate-200/20;
+  }
+
+  .info-box {
+    @apply flex items-start gap-2 rounded-xl border border-slate-200/60 bg-slate-50/50 px-3 py-2.5 text-xs text-slate-500 dark:border-slate-700/60 dark:bg-slate-800/30 dark:text-slate-400;
+  }
+
+  .dropzone {
+    @apply relative flex cursor-pointer flex-col gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white/70 px-5 py-6 text-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:hover:border-slate-500;
+  }
+
+  .dialog-btn {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition;
+  }
+
+  .dialog-btn-default {
+    @apply border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700;
+  }
+
+  .dialog-btn-danger {
+    @apply border border-rose-600 bg-rose-600 text-white hover:bg-rose-700 dark:border-rose-500 dark:bg-rose-600 dark:hover:bg-rose-700;
+  }
+
+  .dropdown-menu {
+    @apply absolute right-0 top-full z-20 mt-1 min-w-40 rounded-xl border border-slate-200 bg-white py-1 shadow-lg dark:border-slate-700 dark:bg-slate-800;
+  }
+
+  .dropdown-item {
+    @apply flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-slate-600 transition hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-700;
+  }
+
+  .empty-state {
+    @apply col-span-full flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-200 p-10 text-center dark:border-slate-700;
+  }
+
+  .empty-state-icon {
+    @apply flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-200/80 text-slate-400 dark:bg-slate-700/80 dark:text-slate-500;
+  }
+
+  .number-badge {
+    @apply flex h-9 w-9 aspect-square items-center justify-center rounded-xl bg-ink text-xs font-semibold text-paper;
+  }
+
   .reveal {
     animation: reveal 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }

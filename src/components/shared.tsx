@@ -40,8 +40,8 @@ type SectionHeaderProps = {
 export const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) => (
   <div className="flex items-center justify-between gap-4">
     <div>
-      <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h2>
-      {subtitle && <p className="text-sm text-slate-500 dark:text-slate-300">{subtitle}</p>}
+      <h2 className="text-lg font-semibold text-ink">{title}</h2>
+      {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
     </div>
     {action ? <div className="shrink-0">{action}</div> : null}
   </div>

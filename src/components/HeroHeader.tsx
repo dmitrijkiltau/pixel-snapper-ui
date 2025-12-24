@@ -42,7 +42,7 @@ const HeroHeader = () => (
             key={step.title}
             className="flex gap-3 rounded-2xl border border-border bg-surface/75 p-3 shadow-sm"
           >
-            <div className="flex h-9 w-9 aspect-square items-center justify-center rounded-xl bg-ink text-xs font-semibold text-paper">
+            <div className="number-badge">
               {String(index + 1).padStart(2, "0")}
             </div>
             <div className="flex flex-col gap-1">

@@ -46,7 +46,7 @@ const UploadForm = ({
       action={<StepPill tone="dark" label="Step 1" />}
     />
 
-    <label className="group relative flex cursor-pointer flex-col gap-3 rounded-2xl border-2 border-dashed border-slate-300 bg-white/70 px-5 py-6 text-sm transition hover:border-slate-500 dark:border-slate-700 dark:bg-slate-900/60 dark:hover:border-slate-500">
+    <label className="dropzone group">
       <input
         id="image-input"
         type="file"
@@ -71,7 +71,7 @@ const UploadForm = ({
       ) : null}
     </label>
 
-    <div className="flex items-start gap-2 rounded-xl border border-slate-200/60 bg-slate-50/50 px-3 py-2.5 text-xs text-slate-500 dark:border-slate-700/60 dark:bg-slate-800/30 dark:text-slate-400">
+    <div className="info-box">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5 shrink-0 text-slate-400 dark:text-slate-500">
         <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
         <path d="M12 17V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
@@ -90,7 +90,7 @@ const UploadForm = ({
           max="256"
           value={kColorsValue}
           onChange={(event) => onKColorsChange(event.target.value)}
-          className="rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-slate-200 dark:focus:ring-slate-200/20"
+          className="input-field"
         />
         <span className="text-xs font-normal text-slate-500 dark:text-slate-400">1 to 256 colors.</span>
       </label>
@@ -102,7 +102,7 @@ const UploadForm = ({
           min="0"
           value={kSeedValue}
           onChange={(event) => onKSeedChange(event.target.value)}
-          className="rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 text-sm font-medium text-slate-900 shadow-sm focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-100 dark:focus:border-slate-200 dark:focus:ring-slate-200/20"
+          className="input-field"
         />
         <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
           Enter a number to reproduce results, or keep 0 to reroll each snap.
@@ -118,7 +118,7 @@ const UploadForm = ({
         type="button"
         onClick={onEditInput}
         disabled={isLoading || !canEditInput}
-        className="inline-flex items-center justify-center gap-2 rounded-2xl border border-slate-200 bg-white/80 px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-slate-400 hover:text-slate-900 disabled:cursor-not-allowed disabled:border-slate-200/70 disabled:bg-white/50 disabled:text-slate-400 dark:border-slate-700 dark:bg-slate-900/70 dark:text-slate-200 dark:hover:border-slate-500 dark:hover:text-slate-100 dark:disabled:border-slate-700/70 dark:disabled:bg-slate-900/50 dark:disabled:text-slate-500"
+        className="btn-secondary"
       >
         Edit without snapping
       </button>

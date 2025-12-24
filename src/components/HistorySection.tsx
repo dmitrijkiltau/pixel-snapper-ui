@@ -84,7 +84,7 @@ const HistoryCard = ({
           <button
             type="button"
             onClick={() => onSelect(item.id)}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-lg transition hover:bg-white hover:scale-110"
+            className="btn-icon btn-icon-default"
             title="Edit in panel"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -94,7 +94,7 @@ const HistoryCard = ({
           <a
             href={item.dataUrl}
             download={item.downloadName || "snapped.png"}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-slate-700 shadow-lg transition hover:bg-white hover:scale-110"
+            className="btn-icon btn-icon-default"
             title="Download"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -104,7 +104,7 @@ const HistoryCard = ({
           <button
             type="button"
             onClick={() => onDelete(item)}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-rose-500/90 text-white shadow-lg transition hover:bg-rose-500 hover:scale-110"
+            className="btn-icon btn-icon-danger"
             title="Delete"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -144,8 +144,8 @@ const HistoryCard = ({
 };
 
 const HistoryEmpty = () => (
-  <div className="col-span-full flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-slate-200 bg-linear-to-br from-slate-50 to-slate-100/50 p-10 text-center dark:border-slate-700 dark:from-slate-800/50 dark:to-slate-900/50">
-    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-200/80 text-slate-400 dark:bg-slate-700/80 dark:text-slate-500">
+  <div className="empty-state bg-linear-to-br from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-900/50">
+    <div className="empty-state-icon">
       <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
       </svg>
@@ -460,14 +460,14 @@ const HistorySection = ({
             <button
               type="button"
               onClick={closeClearDialog}
-              className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+              className="dialog-btn dialog-btn-default"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={handleConfirmClear}
-              className="inline-flex items-center justify-center rounded-lg border border-rose-600 bg-rose-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-rose-700 dark:border-rose-500 dark:bg-rose-600 dark:hover:bg-rose-700"
+              className="dialog-btn dialog-btn-danger"
             >
               Delete all
             </button>
@@ -525,14 +525,14 @@ const HistorySection = ({
             <button
               type="button"
               onClick={closeDeleteDialog}
-              className="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+              className="dialog-btn dialog-btn-default"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={handleConfirmDelete}
-              className="inline-flex items-center justify-center rounded-lg border border-rose-600 bg-rose-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-rose-700 dark:border-rose-500 dark:bg-rose-600 dark:hover:bg-rose-700"
+              className="dialog-btn dialog-btn-danger"
             >
               Delete
             </button>
