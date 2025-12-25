@@ -139,7 +139,7 @@ export default function ResultFullEdit({
           <button
             type="button"
             onClick={onSave}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 shadow-sm transition hover:border-emerald-300 hover:text-emerald-900 dark:border-emerald-400/40 dark:bg-emerald-500/15 dark:text-emerald-200 dark:hover:border-emerald-300/70"
+            className="btn-icon btn-icon-success"
             aria-label="Save edits"
           >
             <IconSave />
