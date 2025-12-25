@@ -1,7 +1,7 @@
 import { useRef, useState, useMemo } from "react";
 import Icon from "./Icon";
 import type { HistoryItem, PreviewBackgroundOption } from "./types";
-import { cx, SectionHeader, StepPill, TagPill } from "./shared";
+import { cx, EmptyState, SectionHeader, StepPill, TagPill } from "./shared";
 
 const ITEMS_PER_PAGE = 9;
 
@@ -141,15 +141,11 @@ const HistoryCard = ({
 };
 
 const HistoryEmpty = () => (
-  <div className="empty-state bg-linear-to-br from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-900/50">
-    <div className="empty-state-icon">
-      <Icon name="gallery-add" className="h-7 w-7" />
-    </div>
-    <div className="space-y-1">
-      <p className="text-sm font-medium text-slate-600 dark:text-slate-300">No history yet</p>
-      <p className="text-xs text-slate-500 dark:text-slate-400">Your snapped images will appear here</p>
-    </div>
-  </div>
+  <EmptyState
+    icon={<Icon name="gallery-add" className="h-7 w-7" />}
+    title="No history yet"
+    description="Your snapped images will appear here"
+  />
 );
 
 type PaginationProps = {

@@ -46,3 +46,21 @@ export const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) =
     {action ? <div className="shrink-0">{action}</div> : null}
   </div>
 );
+
+type EmptyStateProps = {
+  icon: ReactNode;
+  title: string;
+  description: string;
+};
+
+export const EmptyState = ({ icon, title, description }: EmptyStateProps) => (
+  <div className="empty-state w-full flex-1 bg-linear-to-br from-slate-50 to-slate-100/50 dark:from-slate-800/50 dark:to-slate-900/50">
+    <div className="empty-state-icon">
+      {icon}
+    </div>
+    <div className="space-y-1">
+      <p className="text-sm font-medium text-slate-600 dark:text-slate-300">{title}</p>
+      <p className="text-xs text-slate-500 dark:text-slate-400">{description}</p>
+    </div>
+  </div>
+);

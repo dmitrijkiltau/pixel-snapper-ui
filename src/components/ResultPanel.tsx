@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useReducer, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, TouchEvent as ReactTouchEvent } from "react";
 import Icon from "./Icon";
-import { cx, SectionHeader, StepPill } from "./shared";
+import { cx, EmptyState, SectionHeader, StepPill } from "./shared";
 import type { PreviewBackgroundOption } from "./types";
 import ResultPreview, { type EditTool } from "./ResultPreview";
 import ResultFullEdit from "./ResultFullEdit";
@@ -1448,14 +1448,11 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                   </a>
                 </>
               ) : (
-                <div className="flex flex-col items-center gap-3 py-8">
-                  <div className="rounded-full bg-slate-100 p-4 dark:bg-slate-800">
-                    <Icon name="gallery-add" className="h-8 w-8 text-slate-400 dark:text-slate-500" />
-                  </div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Upload an image and hit <span className="font-medium text-slate-700 dark:text-slate-300">Snap</span> to see results
-                  </p>
-                </div>
+                <EmptyState
+                  icon={<Icon name="gallery-add" className="h-7 w-7" />}
+                  title="No result yet"
+                  description="Upload an image and hit Snap to see results"
+                />
               )}
             </div>
           </div>
