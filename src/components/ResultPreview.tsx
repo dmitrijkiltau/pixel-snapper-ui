@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
 import type { PointerEvent as ReactPointerEvent, TouchEvent as ReactTouchEvent, RefObject } from "react";
+import Icon from "./Icon";
 import { cx } from "./shared";
 import type { PreviewBackgroundOption } from "./types";
 
@@ -198,7 +199,7 @@ const ResultPreview = forwardRef<HTMLDivElement, ResultPreviewProps>(
               onPointerDown={(event) => event.stopPropagation()}
               onPointerUp={(event) => event.stopPropagation()}
               className={cx(
-                "pointer-events-auto btn-icon-sm rounded-full transition hover:text-slate-700",
+                "pointer-events-auto btn-icon-sm rounded-full transition hover:text-ink dark:hover:text-paper",
                 showGrid
                   ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
                   : ""
@@ -206,19 +207,7 @@ const ResultPreview = forwardRef<HTMLDivElement, ResultPreviewProps>(
               aria-pressed={showGrid}
               aria-label="Toggle grid"
             >
-              <svg
-                viewBox="0 0 24 24"
-                className="h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <path
-                  d="M4 9h16M4 15h16M9 4v16M15 4v16"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              <Icon name="hashtag" className="h-4 w-4" />
             </button>
           ) : null}
           {onTogglePreviewBackground ? (
@@ -227,37 +216,13 @@ const ResultPreview = forwardRef<HTMLDivElement, ResultPreviewProps>(
               onClick={onTogglePreviewBackground}
               onPointerDown={(event) => event.stopPropagation()}
               onPointerUp={(event) => event.stopPropagation()}
-              className="pointer-events-auto btn-icon-sm rounded-full transition hover:text-slate-700 dark:hover:text-slate-100"
+              className="pointer-events-auto btn-icon-sm rounded-full transition hover:text-ink dark:hover:text-paper"
               aria-label="Toggle preview background"
             >
               {previewBackground === "light" ? (
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <path
-                    d="M14.5 4.5A7.5 7.5 0 0 0 19.5 15a7.5 7.5 0 1 1-5-10.5Z"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <Icon name="moon" className="h-4 w-4" />
               ) : (
-                <svg
-                  viewBox="0 0 24 24"
-                  className="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <circle cx="12" cy="12" r="4" />
-                  <path
-                    d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"
-                    strokeLinecap="round"
-                  />
-                </svg>
+                <Icon name="sun" className="h-4 w-4" />
               )}
             </button>
           ) : null}

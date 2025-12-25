@@ -1,6 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import type { ProgressStepKey, ProgressStepState } from "./types";
 import { cx } from "./shared";
+import Icon from "./Icon";
 
 const stepIconClasses: Record<ProgressStepState, string> = {
   idle: "border-border bg-surface text-muted",
@@ -16,69 +17,39 @@ const stepLabelClasses: Record<ProgressStepState, string> = {
   error: "text-error",
 };
 
+const completeStepIcon = <Icon name="gallery-check" className="h-4 w-4" />;
+
 const progressStepMeta: Array<{
   key: ProgressStepKey;
   label: string;
   icon: ReactNode;
   completeIcon: ReactNode;
 }> = [
-    {
-      key: "upload",
-      label: "Upload",
-      icon: (
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-          <path d="M12 16V6M8 10l4-4 4 4" />
-        </svg>
-      ),
-      completeIcon: (
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-          <path d="M5 12l5 5L20 7" />
-        </svg>
-      ),
-    },
-    {
-      key: "queue",
-      label: "Queue",
-      icon: (
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-          <path d="M4 7h16M4 12h10M4 17h6" />
-        </svg>
-      ),
-      completeIcon: (
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-          <path d="M5 12l5 5L20 7" />
-        </svg>
-      ),
-    },
-    {
-      key: "snap",
-      label: "Snap",
-      icon: (
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-          <rect x="5" y="5" width="5" height="5" /><rect x="14" y="5" width="5" height="5" /><rect x="5" y="14" width="5" height="5" /><rect x="14" y="14" width="5" height="5" />
-        </svg>
-      ),
-      completeIcon: (
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-          <path d="M5 12l5 5L20 7" />
-        </svg>
-      ),
-    },
-    {
-      key: "ready",
-      label: "Ready",
-      icon: (
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-          <path d="M5 12l5 5L20 7" />
-        </svg>
-      ),
-      completeIcon: (
-        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-          <path d="M5 12l5 5L20 7" />
-        </svg>
-      ),
-    },
-  ];
+  {
+    key: "upload",
+    label: "Upload",
+    icon: <Icon name="gallery-add" className="h-4 w-4" />,
+    completeIcon: completeStepIcon,
+  },
+  {
+    key: "queue",
+    label: "Queue",
+    icon: <Icon name="gallery-wide" className="h-4 w-4" />,
+    completeIcon: completeStepIcon,
+  },
+  {
+    key: "snap",
+    label: "Snap",
+    icon: <Icon name="code-scan" className="h-4 w-4" />,
+    completeIcon: completeStepIcon,
+  },
+  {
+    key: "ready",
+    label: "Ready",
+    icon: completeStepIcon,
+    completeIcon: completeStepIcon,
+  },
+];
 
 type ProgressStepProps = {
   step: typeof progressStepMeta[number];

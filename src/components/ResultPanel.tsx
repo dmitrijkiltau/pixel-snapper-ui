@@ -1450,11 +1450,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
               ) : (
                 <div className="flex flex-col items-center gap-3 py-8">
                   <div className="rounded-full bg-slate-100 p-4 dark:bg-slate-800">
-                    <svg className="h-8 w-8 text-slate-400 dark:text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="3" width="18" height="18" rx="2" />
-                      <circle cx="8.5" cy="8.5" r="1.5" />
-                      <path d="m21 15-5-5L5 21" />
-                    </svg>
+                    <Icon name="gallery-add" className="h-8 w-8 text-slate-400 dark:text-slate-500" />
                   </div>
                   <p className="text-sm text-slate-500 dark:text-slate-400">
                     Upload an image and hit <span className="font-medium text-slate-700 dark:text-slate-300">Snap</span> to see results
