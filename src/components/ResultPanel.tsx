@@ -617,7 +617,6 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
     }
     const dataUrl = canvas.toDataURL("image/png");
     lastLoadedUrlRef.current = dataUrl;
-    onCommitEdits(dataUrl);
     dispatchEditHistory({ type: "push", dataUrl });
     setHasPendingEdits(false);
     refreshPaletteFromCanvas(true);
@@ -630,7 +629,6 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
     lastLoadedUrlRef.current = dataUrl;
     setHasPendingEdits(false);
     loadImageFromUrl(dataUrl);
-    onCommitEdits(dataUrl);
   };
 
   const handleUndo = () => {
@@ -1104,8 +1102,11 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
     if (!hasResult) {
       return;
     }
-    // Get the current image URL from history or result
-    const currentUrl = editHistory.entries[editHistory.index] ?? resultUrl;
+    // When exiting edit mode, always load from resultUrl (parent state)
+    // When entering edit mode, load from edit history or result
+    const currentUrl = isEditing 
+      ? (editHistory.entries[editHistory.index] ?? resultUrl)
+      : resultUrl;
     if (currentUrl) {
       loadImageFromUrl(currentUrl);
     }
@@ -1170,9 +1171,25 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
 
   const handleDiscard = () => {
     const initialUrl = editHistory.entries[0];
-    if (initialUrl && initialUrl !== lastLoadedUrlRef.current) {
-      loadImageFromUrl(initialUrl);
-      onCommitEdits(initialUrl);
+    if (initialUrl && editCanvasRef.current) {
+      // Restore edit canvas to initial state
+      const image = new Image();
+      image.onload = () => {
+        const editCanvas = editCanvasRef.current;
+        if (!editCanvas) return;
+        
+        const width = resultWidth ?? image.naturalWidth;
+        const height = resultHeight ?? image.naturalHeight;
+        editCanvas.width = width;
+        editCanvas.height = height;
+        
+        const ctx = getCanvasContext(editCanvas);
+        if (ctx) {
+          ctx.clearRect(0, 0, width, height);
+          ctx.drawImage(image, 0, 0, width, height);
+        }
+      };
+      image.src = initialUrl;
     }
 
     setHasPendingEdits(false);
