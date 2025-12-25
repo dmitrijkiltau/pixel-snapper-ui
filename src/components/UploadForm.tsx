@@ -1,4 +1,5 @@
 import type { ChangeEvent, FormEvent } from "react";
+import Icon from "./Icon";
 import { cx, SectionHeader, StepPill } from "./shared";
 
 type UploadFormProps = {
@@ -72,11 +73,7 @@ const UploadForm = ({
     </label>
 
     <div className="info-box">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5 shrink-0 text-slate-400 dark:text-slate-500">
-        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
-        <path d="M12 17V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        <circle cx="1" cy="1" r="1" transform="matrix(1 0 0 -1 11 9)" fill="currentColor"/>
-      </svg>
+      <Icon name="info-circle" className="h-3.5 w-3.5 shrink-0" />
       <em>AI pixel outputs snap best when they are slightly oversized.</em>
     </div>
 

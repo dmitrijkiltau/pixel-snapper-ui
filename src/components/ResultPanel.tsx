@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useReducer, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, TouchEvent as ReactTouchEvent } from "react";
+import Icon from "./Icon";
 import { cx, SectionHeader, StepPill } from "./shared";
 import type { PreviewBackgroundOption } from "./types";
 import ResultPreview, { type EditTool } from "./ResultPreview";
@@ -13,28 +14,6 @@ type PaletteEntry = {
   color: string;
   percentage: number;
 };
-
-const IconMoreVertical = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4">
-    <path d="M8 12H8.00901M12.0045 12H12.0135M15.991 12H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
-  </svg>
-);
-
-const IconHelp = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" className="h-4 w-4">
-    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5"/>
-    <path d="M12 17V11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-    <circle cx="1" cy="1" r="1" transform="matrix(1 0 0 -1 11 9)" fill="currentColor"/>
-  </svg>
-);
-
-const IconEdit = () => (
-  <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 17.25V20h2.75L18.81 8.94l-2.75-2.75L4 17.25z" />
-    <path d="M16.06 5.69 18.31 7.94" />
-  </svg>
-);
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
@@ -1301,7 +1280,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100"
                 aria-label="Start editing result"
               >
-                <IconEdit />
+                <Icon name="pen-new-square" className="h-4 w-4" />
               </button>
             </div>
 
@@ -1323,7 +1302,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                   aria-label="Toggle help"
                   title="Help"
                 >
-                  <IconHelp />
+                  <Icon name="info-circle" className="h-4 w-4" />
                 </button>
                 {showHelp && hasResult ? (
                   <div className="pointer-events-auto absolute right-0 top-full z-20 mt-1 min-w-[16rem] rounded-2xl border border-slate-200 bg-white/90 px-4 py-3 text-[0.7rem] text-slate-600 shadow-lg dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-300">
@@ -1344,7 +1323,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                   aria-label="More options"
                   aria-expanded={showMoreMenu}
                 >
-                  <IconMoreVertical />
+                  <Icon name="menu-dots-circle" className="h-4 w-4" />
                 </button>
                 {showMoreMenu ? (
                   <div className="dropdown-menu">
@@ -1464,11 +1443,7 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
                     download={resultDownloadName}
                     className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl border border-slate-900 bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-slate-200"
                   >
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                      <polyline points="7 10 12 15 17 10" />
-                      <line x1="12" y1="15" x2="12" y2="3" />
-                    </svg>
+                    <Icon name="download" className="h-4 w-4" />
                     Download PNG
                   </a>
                 </>

@@ -1,4 +1,5 @@
 import { useRef, useState, useMemo } from "react";
+import Icon from "./Icon";
 import type { HistoryItem, PreviewBackgroundOption } from "./types";
 import { cx, SectionHeader, StepPill, TagPill } from "./shared";
 
@@ -87,9 +88,7 @@ const HistoryCard = ({
             className="btn-icon btn-icon-default"
             title="Edit in panel"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-            </svg>
+            <Icon name="pen-new-square" className="h-4 w-4" />
           </button>
           <a
             href={item.dataUrl}
@@ -97,9 +96,7 @@ const HistoryCard = ({
             className="btn-icon btn-icon-default"
             title="Download"
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
+            <Icon name="download" className="h-4 w-4" />
           </a>
           <button
             type="button"
