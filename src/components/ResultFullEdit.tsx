@@ -131,7 +131,7 @@ export default function ResultFullEdit({
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100"
+            className="btn-icon btn-icon-default"
             aria-label="Cancel edits"
           >
             <IconCancel />
@@ -227,9 +227,9 @@ export default function ResultFullEdit({
               type="button"
               onClick={onToggleHelp}
               className={cx(
-                "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200",
+                "btn-icon btn-icon-default",
                 showHelp
-                  ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
+                  ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
                   : ""
               )}
               aria-pressed={showHelp}
@@ -253,38 +253,26 @@ export default function ResultFullEdit({
             type="button"
             onClick={onToggleGrid}
             className={cx(
-              "inline-flex items-center justify-center rounded-full border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200",
+              "btn-icon btn-icon-default",
               showGrid
-                ? "border-slate-900 bg-slate-900 text-white dark:border-slate-100 dark:bg-slate-100 dark:text-slate-900"
+                ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
                 : ""
             )}
             aria-pressed={showGrid}
             aria-label="Toggle grid"
           >
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M4 9h16M4 15h16M9 4v16M15 4v16" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            <Icon name="hashtag" className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={onTogglePreviewBackground}
-            className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white p-1.5 text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200"
+            className="btn-icon btn-icon-default"
             aria-label="Toggle preview background"
           >
-            {previewBackground === "light" ? (
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path
-                  d="M14.5 4.5A7.5 7.5 0 0 0 19.5 15a7.5 7.5 0 1 1-5-10.5Z"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            ) : (
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <circle cx="12" cy="12" r="4" />
-                <path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" strokeLinecap="round" />
-              </svg>
-            )}
+            <Icon 
+              name={previewBackground === "light" ? "moon" : "sun"} 
+              className="h-4 w-4" 
+            />
           </button>
         </div>
       </div>
