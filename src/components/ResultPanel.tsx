@@ -1136,7 +1136,9 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
     if (!hasResult) {
       return;
     }
-    if (!editHistory.entries.length && resultUrl) {
+    // Always save the current state as the starting point for this edit session
+    // This ensures that discarding reverts to the state before this edit, not the original
+    if (resultUrl) {
       dispatchEditHistory({ type: "reset", dataUrl: resultUrl });
     }
     // Reset edit zoom/pan and mark for centering
@@ -1156,7 +1158,8 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
       const dataUrl = editCanvas.toDataURL("image/png");
       lastLoadedUrlRef.current = dataUrl;
       onCommitEdits(dataUrl);
-      dispatchEditHistory({ type: "push", dataUrl });
+      // Clear edit history on save - next edit session should start fresh
+      dispatchEditHistory({ type: "reset", dataUrl });
       // Sync to preview canvas
       loadImageFromUrl(dataUrl);
     }
