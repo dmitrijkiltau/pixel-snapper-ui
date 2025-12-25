@@ -5,8 +5,6 @@ import { cx } from "./shared";
 import type { PreviewBackgroundOption } from "./types";
 import ResultPreview, { type EditTool } from "./ResultPreview";
 
-const PALETTE_SIZE = 12;
-
 type PaletteEntry = {
   color: string;
   percentage: number;
@@ -42,12 +40,6 @@ const IconCancel = () => (
 const IconSave = () => (
   <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="M5 12l4 4 10-10" />
-  </svg>
-);
-
-const IconFullscreenExit = () => (
-  <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
   </svg>
 );
 
@@ -111,7 +103,6 @@ export type ResultFullEditProps = {
   onRedo: () => void;
   onSave: () => void;
   onCancel: () => void;
-  onExitFullscreen: () => void;
   onPaletteAction: (color: string) => void;
 };
 
@@ -149,7 +140,6 @@ export default function ResultFullEdit({
   onRedo,
   onSave,
   onCancel,
-  onExitFullscreen,
   onPaletteAction,
 }: ResultFullEditProps) {
   // Filter out entries with zero percentage and normalize to fill 100%
@@ -178,30 +168,20 @@ export default function ResultFullEdit({
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={onExitFullscreen}
+            onClick={onCancel}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100"
-            aria-label="Exit fullscreen editing"
+            aria-label="Cancel edits"
           >
-            <IconFullscreenExit />
+            <IconCancel />
           </button>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-slate-300 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:border-slate-600 dark:hover:text-slate-100"
-              aria-label="Cancel edits"
-            >
-              <IconCancel />
-            </button>
-            <button
-              type="button"
-              onClick={onSave}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 shadow-sm transition hover:border-emerald-300 hover:text-emerald-900 dark:border-emerald-400/40 dark:bg-emerald-500/15 dark:text-emerald-200 dark:hover:border-emerald-300/70"
-              aria-label="Save edits"
-            >
-              <IconSave />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onSave}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 text-emerald-700 shadow-sm transition hover:border-emerald-300 hover:text-emerald-900 dark:border-emerald-400/40 dark:bg-emerald-500/15 dark:text-emerald-200 dark:hover:border-emerald-300/70"
+            aria-label="Save edits"
+          >
+            <IconSave />
+          </button>
           <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" />
           {/* Tool selection */}
           <div className="flex items-center rounded-full border border-slate-200 bg-white p-0.5 dark:border-slate-700 dark:bg-slate-800">

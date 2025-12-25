@@ -6,7 +6,7 @@ import ResultPreview, { type EditTool } from "./ResultPreview";
 import ResultFullEdit from "./ResultFullEdit";
 
 const MIN_ZOOM = 0.5;
-const MAX_ZOOM = 8;
+const MAX_ZOOM = 12;
 const PALETTE_SIZE = 12;
 
 type PaletteEntry = {
@@ -1146,10 +1146,6 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
     setIsEditing(true);
   };
 
-  const handleExitFullscreen = () => {
-    openCancelDialog();
-  };
-
   const handleSaveEdits = () => {
     if (!hasResult) {
       return;
@@ -1266,7 +1262,6 @@ const ResultPanel = forwardRef<HTMLElement, ResultPanelProps>(({
           onRedo={handleRedo}
           onSave={handleSaveEdits}
           onCancel={openCancelDialog}
-          onExitFullscreen={handleExitFullscreen}
           onPaletteAction={handlePaletteSegmentAction}
         />
       ) : null}
